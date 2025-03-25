@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:n47_web/about/about_page.dart';
 import 'package:n47_web/history/history_page.dart';
 
+import '../contact/contact_page.dart';
 import '../home/home_page.dart';
 
 class AppRouter {
@@ -12,9 +13,9 @@ class AppRouter {
       case '/history':
         return createFadeRoute(HistoryPage(), settings);
       // case '/sponsors':
-      //   return MaterialPageRoute(builder: (_) => ContactPage());
-      // case '/contact':
-      //   return MaterialPageRoute(builder: (_) => ContactPage());
+      //   return createFadeRoute(SponsorsPage(), settings);
+      case '/contact':
+        return createFadeRoute(ContactPage(), settings);
       case '/about':
         return createFadeRoute(AboutPage(), settings);
       default:
