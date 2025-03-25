@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:n47_web/about/about_page.dart';
+import 'package:n47_web/history/history_page.dart';
+
+import '../home/home_page.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      // case '/history':
-      //   return MaterialPageRoute(builder: (_) => ServicesPage());
+      case '/':
+        return createFadeRoute(HomePage(), settings);
+      case '/history':
+        return createFadeRoute(HistoryPage(), settings);
       // case '/sponsors':
       //   return MaterialPageRoute(builder: (_) => ContactPage());
-    // case '/contact':
-    //   return MaterialPageRoute(builder: (_) => ContactPage());
+      // case '/contact':
+      //   return MaterialPageRoute(builder: (_) => ContactPage());
       case '/about':
-        return MaterialPageRoute(builder: (_) => AboutPage());
+        return createFadeRoute(AboutPage(), settings);
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
@@ -21,5 +26,22 @@ class AppRouter {
           ),
         );
     }
+  }
+
+  static Route<dynamic> createFadeRoute(Widget page, RouteSettings settings) {
+    return PageRouteBuilder(
+      settings: settings,
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeIn,
+          ),
+          child: child,
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 300),
+    );
   }
 }
