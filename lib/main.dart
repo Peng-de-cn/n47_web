@@ -17,7 +17,7 @@ import 'database/event_database.dart';
 void main() async {
   await EventDatabase.init();
 
-  final jsonData = await rootBundle.loadString('asset/data/data.json');
+  final jsonData = await rootBundle.loadString('assets/data/data.json');
   final events = (jsonDecode(jsonData) as List).map((e) => Event.fromJson(e)).toList();
   await EventDatabase.importEvents(events);
 

@@ -32,7 +32,7 @@ class AppHeader extends StatelessWidget {
                   Logger.d('Already on home page, ignoring click');
                 }
               },
-              child: Image.asset('asset/icons/n47_logo.png', width: 60, height: 60),
+              child: Image.asset('assets/icons/n47_logo.png', width: 60, height: 60),
             ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
