@@ -3,6 +3,9 @@ import 'package:n47_web/l10n/generated/app_localizations.dart';
 import 'package:n47_web/navigation/navi_item.dart';
 import 'package:n47_web/utils/Logger.dart';
 
+import '../home/home_page.dart';
+import '../navigation/AppRouter.dart';
+
 class AppHeader extends StatelessWidget {
   const AppHeader({Key? key}) : super(key: key);
 
@@ -23,10 +26,9 @@ class AppHeader extends StatelessWidget {
               onTap: () {
                 final currentRoute = ModalRoute.of(context)?.settings.name ?? '/';
                 if (currentRoute != '/') {
-                  Logger.d('Home clicked');
-                  Navigator.pushNamed(
+                  Navigator.pushReplacement(
                     context,
-                    '/',
+                    AppRouter.createFadeRoute(HomePage(), RouteSettings(name: '/')),
                   );
                 } else {
                   Logger.d('Already on home page, ignoring click');
@@ -41,7 +43,6 @@ class AppHeader extends StatelessWidget {
                   title: AppLocalizations.of(context)!.naviHistory,
                   routeName: '/history',
                   onTap: () {
-                    Logger.d('History clicked');
                     Navigator.pushNamed(context, '/history');
                   },
                 ),
@@ -50,7 +51,6 @@ class AppHeader extends StatelessWidget {
                   title: AppLocalizations.of(context)!.naviSponsors,
                   routeName: '/sponsors',
                   onTap: () {
-                    Logger.d('Sponsors clicked');
                     Navigator.pushNamed(context, '/sponsors');
                   },
                 ),
@@ -59,7 +59,6 @@ class AppHeader extends StatelessWidget {
                   title: AppLocalizations.of(context)!.naviContact,
                   routeName: '/contact',
                   onTap: () {
-                    Logger.d('Contact clicked');
                     Navigator.pushNamed(context, '/contact');
                   },
                 ),

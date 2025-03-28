@@ -52,7 +52,7 @@ class N47App extends StatelessWidget {
         ],
         supportedLocales: const [Locale('en')],
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          scaffoldBackgroundColor: Colors.white,
         ),
         onGenerateRoute: AppRouter.generateRoute,
         home: BlocProvider(create: (context) => HomeBloc(), child: HomePage()));

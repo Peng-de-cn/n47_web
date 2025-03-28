@@ -12,8 +12,7 @@ class NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentRoute = ModalRoute.of(context)?.settings.name ?? '/';
-    final isActive = currentRoute == routeName ||
-        (routeName == '/home' && currentRoute == '/');
+    final isActive = currentRoute == routeName;
 
     return InkWell(
       onTap: () {
