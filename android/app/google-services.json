@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "187191289365",
+    "project_id": "n47web",
+    "storage_bucket": "n47web.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:187191289365:android:865269b3fdaa18c779d01c",
+        "android_client_info": {
+          "package_name": "eu.n47.n47_web"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1qEJ-JeIKNRqEgMflm4valbdTinnJUQA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
