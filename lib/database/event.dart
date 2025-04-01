@@ -7,7 +7,7 @@ part 'event.g.dart';
 @JsonSerializable()
 class Event {
   @HiveField(0)
-  final int id;
+  final String id;
 
   @HiveField(1)
   final String title;
@@ -19,17 +19,17 @@ class Event {
   final String description;
 
   @HiveField(4)
-  final String image;
+  final String imageWeb;
 
   @HiveField(5)
-  final bool isHistory;
+  final String imageMobile;
 
-  Event({required this.id,
+  Event({this.id = '',
     this.title = '',
     this.date = '',
     this.description = '',
-    this.image = '',
-    this.isHistory = false,});
+    this.imageWeb = '',
+    this.imageMobile = ''});
 
   factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
   Map<String, dynamic> toJson() => _$EventToJson(this);

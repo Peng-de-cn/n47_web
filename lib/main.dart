@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:n47_web/firestore/event_storage.dart';
+import 'package:n47_web/database/event_repository.dart';
 import 'package:n47_web/home/home_bloc.dart';
 import 'package:n47_web/home/home_page.dart';
 import 'package:n47_web/l10n/generated/app_localizations.dart';
@@ -14,8 +14,8 @@ import 'package:n47_web/utils/Logger.dart';
 
 import 'bloc/events_cubit.dart';
 import 'database/event.dart';
-import 'database/event_database.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase/fire_store.dart';
 import 'firebase_options.dart';
 
 // void main() async {
@@ -60,12 +60,12 @@ class N47App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: initializeFirebase(), // 异步初始化
+      future: initializeFirebase(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return buildAppContent(); // 初始化完成后显示主界面
+          return buildAppContent();
         }
-        return SplashPage(); // 显示加载动画
+        return SplashPage();
       },
     );
   }
@@ -74,20 +74,17 @@ class N47App extends StatelessWidget {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await EventDatabase.init();
+    await EventRepository.init();
 
-    final jsonData = await rootBundle.loadString('assets/data/data.json');
-    final events = (jsonDecode(jsonData) as List).map((e) => Event.fromJson(e)).toList();
-    await EventDatabase.importEvents(events);
-
-    final historyEvents = EventDatabase.getHistoryEventsSortedByDate();
+    List<Map<String, dynamic>> historyEvents = await Firestore.fetchHistoryEvents();
+    await EventRepository.importHistoryEvents(historyEvents);
   }
 
   Widget buildAppContent() {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => HomeBloc()),
-        BlocProvider(create: (_) => EventsCubit()..loadEvents([])),
+        BlocProvider(create: (_) => EventsCubit()),
       ],
       child: MaterialApp(
           title: 'N47',

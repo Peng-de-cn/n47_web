@@ -1,15 +1,19 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:n47_web/firebase/fire_store.dart';
 import 'package:n47_web/header/app_header.dart';
 import 'package:n47_web/home/home_bloc.dart';
 import '../database/event.dart';
 import '../footer/app_footer.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../bloc/events_cubit.dart';
-import '../navigation/navi_item.dart';
 import '../utils/Logger.dart';
+import '../utils/Util.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -143,7 +147,7 @@ class HomePage extends StatelessWidget {
                 : CrossAxisAlignment.end,
             children: [
               Text(
-                event.date,
+                Util.formatHtmlText(event.date),
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -152,7 +156,7 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                event.title,
+                Util.formatHtmlText(event.title),
                 style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -160,7 +164,7 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                event.description,
+                Util.formatHtmlText(event.description),
                 style: const TextStyle(
                   fontSize: 18,
                   height: 1.5,
@@ -181,24 +185,35 @@ class HomePage extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: AspectRatio(
             aspectRatio: 3 / 4,
-            child: Image.network(
-              event.image,
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
-                        : null,
-                  ),
-                );
-              },
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: Colors.grey[200],
-                  child: const Icon(Icons.broken_image),
+            child: FutureBuilder<String?>(
+              future: Firestore.loadImageUrl(event.imageWeb),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return AnimatedOpacity(
+                    opacity: 0.5,
+                    duration: const Duration(milliseconds: 300),
+                    child: buildLoadingWidget(),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  Logger.e('Image load failed: ${snapshot.error}');
+                  return buildErrorWidget();
+                }
+
+                final url = snapshot.data;
+                if (url == null || url.isEmpty) {
+                  return buildErrorWidget();
+                }
+
+                return CachedNetworkImage(
+                  imageUrl: url,
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) => buildLoadingWidget(),
+                  errorWidget: (_, url, error) => buildErrorWidget(),
+                  maxWidthDiskCache: kIsWeb ? null : 1024,
+                  fadeInDuration: const Duration(milliseconds: 200),
+                  imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
                 );
               },
             ),
@@ -226,24 +241,35 @@ class HomePage extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: AspectRatio(
         aspectRatio: 16 / 9, // image ratio
-        child: Image.network(
-          event.image,
-          fit: BoxFit.cover,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Center(
-              child: CircularProgressIndicator(
-                value: loadingProgress.expectedTotalBytes != null
-                    ? loadingProgress.cumulativeBytesLoaded /
-                    loadingProgress.expectedTotalBytes!
-                    : null,
-              ),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              color: Colors.grey[200],
-              child: const Icon(Icons.broken_image, size: 50),
+        child: FutureBuilder<String?>(
+          future: Firestore.loadImageUrl(event.imageMobile),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return AnimatedOpacity(
+                opacity: 0.5,
+                duration: const Duration(milliseconds: 300),
+                child: buildLoadingWidget(),
+              );
+            }
+
+            if (snapshot.hasError) {
+              Logger.e('Image load failed: ${snapshot.error}');
+              return buildErrorWidget();
+            }
+
+            final url = snapshot.data;
+            if (url == null || url.isEmpty) {
+              return buildErrorWidget();
+            }
+
+            return CachedNetworkImage(
+              imageUrl: url,
+              fit: BoxFit.cover,
+              placeholder: (_, __) => buildLoadingWidget(),
+              errorWidget: (_, url, error) => buildErrorWidget(),
+              maxWidthDiskCache: kIsWeb ? null : 1024,
+              fadeInDuration: const Duration(milliseconds: 200),
+              imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
             );
           },
         ),
@@ -261,7 +287,7 @@ class HomePage extends StatelessWidget {
         mainAxisSize: MainAxisSize.min, // Important: Avoid Infinite Scaling
         children: [
           Text(
-            event.date,
+            Util.formatHtmlText(event.date),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -270,7 +296,7 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            event.title,
+            Util.formatHtmlText(event.title),
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -278,7 +304,7 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            event.description,
+            Util.formatHtmlText(event.description),
             style: const TextStyle(
               fontSize: 16,
               height: 1.5,
@@ -288,4 +314,12 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+
+  Widget buildLoadingWidget() => Center(child: CircularProgressIndicator());
+
+  Widget buildErrorWidget() => Container(
+    color: Colors.grey[200],
+    child: const Icon(Icons.broken_image),
+  );
 }
+

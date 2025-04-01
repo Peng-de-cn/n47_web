@@ -5,19 +5,22 @@ import 'package:n47_web/database/event.dart';
 
 import '../utils/Logger.dart';
 
-class EventDatabase {
+class EventRepository {
   static const _eventsBox = 'events';
+  static const _historyEventsBox = 'history';
   static const _keyBox = 'hashKey';
 
   static Future<void> init() async {
     await Hive.initFlutter();
     Hive.registerAdapter(EventAdapter());
-    await Hive.openBox<Event>(_eventsBox);
+    await Hive.openBox<Event>(_historyEventsBox);
     await Hive.openBox(_keyBox);
   }
 
-  static Future<void> importEvents(List<Event> events) async {
-    final eventsBox = Hive.box<Event>(_eventsBox);
+  static Future<void> importHistoryEvents(List<Map<String, dynamic>> historyEvents) async {
+    final events = historyEvents.map((data) => Event.fromJson(data)).toList();
+
+    final eventsBox = Hive.box<Event>(_historyEventsBox);
     final keyBox = Hive.box(_keyBox);
 
     final newHash = _calculateListHash(events);
@@ -34,24 +37,22 @@ class EventDatabase {
   }
 
   static List<Event> getEvents() {
-    return Hive.box<Event>(_eventsBox).values.toList();
+    return Hive.box<Event>(_historyEventsBox).values.toList();
   }
 
   static List<Event> getHistoryEventsSortedByDate() {
-    return Hive.box<Event>(_eventsBox)
+    return Hive.box<Event>(_historyEventsBox)
         .values
-        .where((event) => event.isHistory)
         .toList()
       ..sort((a, b) => b.date.compareTo(a.date));
   }
 
-  static List<Event> getCurrentEventsSortedByDate() {
-    return Hive.box<Event>(_eventsBox)
-        .values
-        .where((event) => !event.isHistory)
-        .toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
-  }
+  // static List<Event> getCurrentEventsSortedByDate() {
+  //   return Hive.box<Event>(_eventsBox)
+  //       .values
+  //       .toList()
+  //     ..sort((a, b) => b.date.compareTo(a.date));
+  // }
 }
 
 int _calculateListHash(List<Event> events) {

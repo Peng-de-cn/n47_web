@@ -17,12 +17,12 @@ class EventAdapter extends TypeAdapter<Event> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Event(
-      id: fields[0] as int,
+      id: fields[0] as String,
       title: fields[1] as String,
       date: fields[2] as String,
       description: fields[3] as String,
-      image: fields[4] as String,
-      isHistory: fields[5] as bool,
+      imageWeb: fields[4] as String,
+      imageMobile: fields[5] as String,
     );
   }
 
@@ -39,9 +39,9 @@ class EventAdapter extends TypeAdapter<Event> {
       ..writeByte(3)
       ..write(obj.description)
       ..writeByte(4)
-      ..write(obj.image)
+      ..write(obj.imageWeb)
       ..writeByte(5)
-      ..write(obj.isHistory);
+      ..write(obj.imageMobile);
   }
 
   @override
@@ -60,12 +60,12 @@ class EventAdapter extends TypeAdapter<Event> {
 // **************************************************************************
 
 Event _$EventFromJson(Map<String, dynamic> json) => Event(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? '',
       date: json['date'] as String? ?? '',
       description: json['description'] as String? ?? '',
-      image: json['image'] as String? ?? '',
-      isHistory: json['isHistory'] as bool? ?? false,
+      imageWeb: json['imageWeb'] as String? ?? '',
+      imageMobile: json['imageMobile'] as String? ?? '',
     );
 
 Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
@@ -73,6 +73,6 @@ Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
       'title': instance.title,
       'date': instance.date,
       'description': instance.description,
-      'image': instance.image,
-      'isHistory': instance.isHistory,
+      'imageWeb': instance.imageWeb,
+      'imageMobile': instance.imageMobile,
     };
