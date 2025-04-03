@@ -17,22 +17,21 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final events = context.read<EventsCubit>().state;
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            color: Colors.white,
-          ),
-          const AppHeader(),
-          Positioned(
-            top: 100,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: buildContent(events, context),
-          ),
-        ],
-      )
-    );
+        body: Stack(
+      children: [
+        Container(
+          color: Colors.white,
+        ),
+        const AppHeader(),
+        Positioned(
+          top: 100,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: buildContent(events, context),
+        ),
+      ],
+    ));
   }
 
   Widget buildContent(List<Event> events, BuildContext context) {
@@ -40,7 +39,7 @@ class HistoryPage extends StatelessWidget {
       slivers: [
         SliverList(
           delegate: SliverChildBuilderDelegate(
-                (context, index) {
+            (context, index) {
               final event = events[index];
               return LayoutBuilder(
                 builder: (context, constraints) {
@@ -86,9 +85,7 @@ class HistoryPage extends StatelessWidget {
         child: Align(
           alignment: alignLeft ? Alignment.centerLeft : Alignment.centerRight,
           child: Column(
-            crossAxisAlignment: alignLeft
-                ? CrossAxisAlignment.start
-                : CrossAxisAlignment.end,
+            crossAxisAlignment: alignLeft ? CrossAxisAlignment.start : CrossAxisAlignment.end,
             children: [
               Text(
                 Util.formatHtmlText(event.date),
@@ -125,12 +122,74 @@ class HistoryPage extends StatelessWidget {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {},
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: AspectRatio(
+              aspectRatio: 3 / 4,
+              child: FutureBuilder<String?>(
+                future: Firestore.loadImageUrl(event.imageWeb),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return AnimatedOpacity(
+                      opacity: 0.5,
+                      duration: const Duration(milliseconds: 300),
+                      child: buildLoadingWidget(),
+                    );
+                  }
+
+                  if (snapshot.hasError) {
+                    Logger.e('Image load failed: ${snapshot.error}');
+                    return buildErrorWidget();
+                  }
+
+                  final url = snapshot.data;
+                  if (url == null || url.isEmpty) {
+                    return buildErrorWidget();
+                  }
+
+                  return CachedNetworkImage(
+                    imageUrl: url,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => buildLoadingWidget(),
+                    errorWidget: (_, url, error) => buildErrorWidget(),
+                    maxWidthDiskCache: kIsWeb ? null : 1024,
+                    fadeInDuration: const Duration(milliseconds: 200),
+                    imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildMobileLayout(int index, Event event, int eventsLength) {
+    return Column(
+      children: [
+        buildMobileImageContent(event),
+        buildMobileTextContent(event, true),
+        if (index != eventsLength - 1) const Divider(height: 40),
+      ],
+    );
+  }
+
+  Widget buildMobileImageContent(Event event) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {},
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: AspectRatio(
-            aspectRatio: 3 / 4,
+            aspectRatio: 16 / 9, // image ratio
             child: FutureBuilder<String?>(
-              future: Firestore.loadImageUrl(event.imageWeb),
+              future: Firestore.loadImageUrl(event.imageMobile),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return AnimatedOpacity(
@@ -167,67 +226,11 @@ class HistoryPage extends StatelessWidget {
     );
   }
 
-  Widget buildMobileLayout(int index, Event event, int eventsLength) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          buildMobileImageContent(event),
-          buildMobileTextContent(event, true),
-          if (index != eventsLength - 1) const Divider(height: 40),
-        ],
-      ),
-    );
-  }
-
-  Widget buildMobileImageContent(Event event) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: AspectRatio(
-        aspectRatio: 16 / 9, // image ratio
-        child: FutureBuilder<String?>(
-          future: Firestore.loadImageUrl(event.imageMobile),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return AnimatedOpacity(
-                opacity: 0.5,
-                duration: const Duration(milliseconds: 300),
-                child: buildLoadingWidget(),
-              );
-            }
-
-            if (snapshot.hasError) {
-              Logger.e('Image load failed: ${snapshot.error}');
-              return buildErrorWidget();
-            }
-
-            final url = snapshot.data;
-            if (url == null || url.isEmpty) {
-              return buildErrorWidget();
-            }
-
-            return CachedNetworkImage(
-              imageUrl: url,
-              fit: BoxFit.cover,
-              placeholder: (_, __) => buildLoadingWidget(),
-              errorWidget: (_, url, error) => buildErrorWidget(),
-              maxWidthDiskCache: kIsWeb ? null : 1024,
-              fadeInDuration: const Duration(milliseconds: 200),
-              imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
-            );
-          },
-        ),
-      ),
-    );
-  }
-
   Widget buildMobileTextContent(Event event, bool alignLeft) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
-        crossAxisAlignment: alignLeft
-            ? CrossAxisAlignment.start
-            : CrossAxisAlignment.end,
+        crossAxisAlignment: alignLeft ? CrossAxisAlignment.start : CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min, // Important: Avoid Infinite Scaling
         children: [
           Text(
@@ -262,8 +265,7 @@ class HistoryPage extends StatelessWidget {
   Widget buildLoadingWidget() => Center(child: CircularProgressIndicator());
 
   Widget buildErrorWidget() => Container(
-    color: Colors.grey[200],
-    child: const Icon(Icons.broken_image),
-  );
-
+        color: Colors.grey[200],
+        child: const Icon(Icons.broken_image),
+      );
 }

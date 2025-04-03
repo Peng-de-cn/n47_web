@@ -46,7 +46,7 @@ class Firestore {
     try {
       final ref = FirebaseStorage.instanceFor().ref().child(imagePath);
       final url = await ref.getDownloadURL();
-      Logger.d('Successfully loaded image URL: $url');
+      // Logger.d('Successfully loaded image URL: $url');
       return url;
     } catch (e, stackTrace) {
       Logger.e('Failed to load image: $e, error:$e, stackTrace: $stackTrace');
