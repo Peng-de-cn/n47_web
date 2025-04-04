@@ -45,7 +45,7 @@ class ContactPage extends StatelessWidget {
                 const SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: () async {
-                    await EmailSender.submitForm("test@gmail.com", "12345");
+                    await EmailSender.submitForm("zhangpeng.snowboard@gmail.com", "这是测试邮件，我在做测试，从网站发过来的");
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),

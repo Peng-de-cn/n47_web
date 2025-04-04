@@ -13,19 +13,14 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'google'
+    'google',
+    'prettier'
   ],
   ignorePatterns: [
     'lib/**/*',
     '.eslintrc.js' // 忽略自身文件检查
   ],
   rules: {
-    'no-undef': 'off',
-    'quotes': 'off',
-    'object-curly-spacing': 'off',
-    'operator-linebreak': 'off',
-    'comma-dangle': 'off',
-    'padded-blocks': 'off',
-    'max-len': 'off'
+    'valid-jsdoc': ['off'] // 完全禁用 JSDoc 检查
   }
 };

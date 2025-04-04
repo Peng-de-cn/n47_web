@@ -4,7 +4,7 @@ import 'dart:convert';
 class EmailSender {
   static Future<void> submitForm(String email, String message) async {
     // 替换为你的 Firebase 函数 URL
-    final url = 'https://us-central1-n47web.cloudfunctions.net/sendEmail';
+    final url = 'https://us-central1-n47web.cloudfunctions.net/sendemail';
 
     try {
       final response = await http.post(
