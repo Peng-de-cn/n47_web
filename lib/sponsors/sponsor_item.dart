@@ -13,8 +13,8 @@ class SponsorItem extends StatelessWidget {
     required this.imagePath,
     required this.url,
     required this.maxSize,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

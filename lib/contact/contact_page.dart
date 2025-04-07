@@ -1,30 +1,94 @@
 import 'package:flutter/material.dart';
 import 'package:n47_web/contact/email_sender.dart';
 import 'package:n47_web/header/app_header.dart';
-
+import 'package:n47_web/l10n/generated/app_localizations.dart';
+import 'package:n47_web/utils/Logger.dart';
 import '../footer/app_footer.dart';
 
-class ContactPage extends StatelessWidget {
-  const ContactPage({Key? key}) : super(key: key);
+class ContactPage extends StatefulWidget {
+  const ContactPage({super.key});
+
+  @override
+  ContactPageState createState() => ContactPageState();
+}
+
+class ContactPageState extends State<ContactPage> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _subjectController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
+
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _subjectController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> submitForm() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+    });
+
+      try {
+        await EmailSender.submitForm(
+          _nameController.text,
+          _emailController.text,
+          _subjectController.text,
+          _messageController.text
+        );
+
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.sendSuccessDialog)),
+        );
+
+        if (!mounted) return;
+        // Clear form after successful submission
+        _formKey.currentState!.reset();
+        _nameController.clear();
+        _emailController.clear();
+        _subjectController.clear();
+        _messageController.clear();
+        Logger.d("Form reset and controllers cleared.");
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.sendFailedDialog)),
+        );
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Stack(
-          children: [
-            Container(
-              color: Colors.white,
-            ),
-            const AppHeader(),
-            Positioned(
-              top: 100,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: buildContent(context),
-            ),
-          ],
-        )
+      body: Stack(
+        children: [
+          Container(
+            color: Colors.white,
+          ),
+          const AppHeader(),
+          Positioned(
+            top: 100,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: buildContent(context),
+          ),
+        ],
+      ),
     );
   }
 
@@ -41,26 +105,145 @@ class ContactPage extends StatelessWidget {
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 40),
-                ElevatedButton(
-                  onPressed: () async {
-                    await EmailSender.submitForm("zhangpeng.snowboard@gmail.com", "这是测试邮件，我在做测试，从网站发过来的");
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                    backgroundColor: Colors.black, // Button color
-                    foregroundColor: Colors.white, // Text color
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                Text(
+                  AppLocalizations.of(context)!.contactTitle,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
-                  child: const Text(
-                    'Submit Form',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  AppLocalizations.of(context)!.contactSubtitle,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Colors.grey[700],
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _nameController,
+                              decoration: InputDecoration(
+                                labelText: AppLocalizations.of(context)!.labelName,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[100],
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return AppLocalizations.of(context)!.nameEmptyError;
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: TextFormField(
+                              controller: _emailController,
+                              decoration: InputDecoration(
+                                labelText: AppLocalizations.of(context)!.labelEmail,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[100],
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return AppLocalizations.of(context)!.emailEmptyError;
+                                }
+                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                    .hasMatch(value)) {
+                                  return AppLocalizations.of(context)!.emailInvalidError;
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        controller: _subjectController,
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.labelSubject,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return AppLocalizations.of(context)!.subjectEmptyError;
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        controller: _messageController,
+                        maxLines: 5,
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.labelMessage,
+                          alignLabelWithHint: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return AppLocalizations.of(context)!.messageEmptyError;
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 30),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : submitForm,
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: _isLoading
+                              ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                              : Text(
+                            AppLocalizations.of(context)!.sendMessageButton,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 60),

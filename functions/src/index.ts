@@ -101,19 +101,20 @@ app.post('/', async (req, res) => {
     });
 
     // 1. 验证请求数据
-    const { email, message } = req.body;
-    if (!email || !message) {
+    const { name, email, subject, message } = req.body;
+    if (!name || !email|| !subject|| !message) {
       console.warn(`[${requestId}] 参数验证失败`);
       return res.status(400).json({
         success: false,
         error: '缺少必填参数',
-        required: ['email', 'message']
+        required: ['name', 'email', 'subject', 'message']
       });
     }
 
     // 2. 获取并验证配置
     const sgApiKey = sendgridKey.value();
     const senderEmail = fromEmail.value();
+    console.log('senderEmail:', senderEmail);
 
     if (!sgApiKey?.startsWith('SG.')) {
       throw new Error('无效的API密钥格式 (必须以SG.开头)');
@@ -124,30 +125,26 @@ app.post('/', async (req, res) => {
 
     // 4. 构造邮件
     const msg: sgMail.MailDataRequired = {
-      to: "peng.zhang@n47.eu",
+      to: "zhangpeng.snowboard@gmail.com",
       from: {
         email: senderEmail,
-        name: "网站通知服务" // 增加发件人名称
+        name: "N47 web" // 发件人名称
       },
-      subject: "新邮件通知",
-      text: `发件人: ${email}\n内容: ${message}`,
+      subject: "New email from web",
+      text: `From: ${email}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px;">
-          <h2 style="color: #333;">新邮件通知</h2>
-          <p><strong>发件人:</strong> ${email}</p>
+          <h2 style="color: #333;">${subject}</h2>
+          <p><strong>From:</strong> ${email}</p>
+          <p><strong>Name:</strong> ${name}</p>
           <div style="background: #f5f5f5; padding: 15px; border-radius: 5px;">
             ${message.replace(/\n/g, '<br>')}
           </div>
           <p style="color: #999; font-size: 12px; margin-top: 20px;">
-            此邮件由系统自动发送，请勿直接回复
+            This email is sent automatically by the system, please do not reply directly.
           </p>
         </div>
-      `,
-      mailSettings: {
-        sandboxMode: {
-          enable: process.env.NODE_ENV === 'test' // 测试模式不真实发送
-        }
-      }
+      `
     };
 
     // 5. 发送邮件（带重试机制）

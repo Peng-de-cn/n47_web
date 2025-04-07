@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:n47_web/header/app_header.dart';
+import 'package:n47_web/l10n/generated/app_localizations.dart';
 import '../bloc/events_cubit.dart';
 import '../database/event.dart';
 import '../firebase/fire_store.dart';
@@ -10,36 +11,201 @@ import '../footer/app_footer.dart';
 import '../utils/Logger.dart';
 import '../utils/Util.dart';
 
-class HistoryPage extends StatelessWidget {
-  const HistoryPage({Key? key}) : super(key: key);
+class HistoryPage extends StatefulWidget {
+  const HistoryPage({super.key});
+
+  @override
+  HistoryPageState createState() => HistoryPageState();
+}
+
+class HistoryPageState extends State<HistoryPage> {
+  final ScrollController _scrollController = ScrollController();
+  int _currentSeasonIndex = 0;
+  List<String> _availableSeasons = [];
+  late List<List<Event>> _seasonalEvents;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAvailableSeasons();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _loadAvailableSeasons() {
+    final events = context.read<EventsCubit>().state;
+
+    // 按日期排序事件
+    events.sort((a, b) => _parseDate(a.date).compareTo(_parseDate(b.date)));
+
+    // 分组到各个雪季
+    final seasonMap = <String, List<Event>>{};
+
+    for (final event in events) {
+      final date = _parseDate(event.date);
+      final season = _getSeasonForDate(date);
+
+      seasonMap.putIfAbsent(season, () => []).add(event);
+    }
+
+    // 获取所有雪季并按时间排序(最新的在前)
+    _availableSeasons = seasonMap.keys.toList()
+      ..sort((a, b) => _parseSeason(b).compareTo(_parseSeason(a)));
+
+    // 保存每个雪季的事件列表
+    _seasonalEvents = _availableSeasons.map((s) => seasonMap[s]!).toList();
+
+    setState(() {
+      if (_availableSeasons.isNotEmpty) {
+        _currentSeasonIndex = 0;
+      }
+    });
+  }
+
+  DateTime _parseDate(String dateStr) {
+    try {
+      if (dateStr.contains('-')) {
+        return DateTime.parse(dateStr);
+      }
+      final parts = dateStr.split(' ');
+      if (parts.length == 3) {
+        final month = _monthNameToNumber(parts[0]);
+        final day = parts[1].replaceAll(',', '');
+        final year = parts[2];
+        return DateTime(int.parse(year), month, int.parse(day));
+      }
+    } catch (e) {
+      Logger.e('Error parsing date: $dateStr - $e');
+    }
+    return DateTime.now();
+  }
+
+  int _monthNameToNumber(String month) {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return months.indexWhere((m) => m.startsWith(month)) + 1;
+  }
+
+  String _getSeasonForDate(DateTime date) {
+    final year = date.year;
+    final month = date.month;
+
+    if (month >= 10) {
+      return '${year.toString().substring(2)}/${(year + 1).toString().substring(2)}';
+    }
+    else if (month <= 5) {
+      return '${(year - 1).toString().substring(2)}/${year.toString().substring(2)}';
+    }
+    return '${(year - 1).toString().substring(2)}/${year.toString().substring(2)}';
+  }
+
+
+  DateTime _parseSeason(String season) {
+    final parts = season.split('/');
+    final startYear = 2000 + int.parse(parts[0]);
+    return DateTime(startYear, 10);
+  }
+
+  List<Event> _getEventsForCurrentSeason() {
+    if (_availableSeasons.isEmpty) return [];
+    return _seasonalEvents[_currentSeasonIndex];
+  }
+
+  void _goToNextSeason() {
+    if (_currentSeasonIndex < _availableSeasons.length - 1) {
+      setState(() {
+        _currentSeasonIndex++;
+      });
+      _scrollToTop();
+    }
+  }
+
+  void _goToPreviousSeason() {
+    if (_currentSeasonIndex > 0) {
+      setState(() {
+        _currentSeasonIndex--;
+      });
+      _scrollToTop();
+    }
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final events = context.read<EventsCubit>().state;
+    final currentEvents = _getEventsForCurrentSeason();
+
     return Scaffold(
-        body: Stack(
-      children: [
-        Container(
-          color: Colors.white,
-        ),
-        const AppHeader(),
-        Positioned(
-          top: 100,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: buildContent(events, context),
-        ),
-      ],
-    ));
+      body: Stack(
+        children: [
+          Container(
+            color: Colors.white,
+          ),
+          const AppHeader(),
+          Positioned(
+            top: 100,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Column(
+              children: [
+                if (_availableSeasons.length > 1) _buildSeasonSelector(),
+                Expanded(
+                  child: buildContent(currentEvents, context),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSeasonSelector() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            onPressed: _currentSeasonIndex > 0 ? _goToPreviousSeason : null,
+          ),
+          Text(
+            '${_availableSeasons[_currentSeasonIndex]} ${AppLocalizations.of(context)!.historyTab}',
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.chevron_right),
+            onPressed: _currentSeasonIndex < _availableSeasons.length - 1 ? _goToNextSeason : null,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget buildContent(List<Event> events, BuildContext context) {
     return CustomScrollView(
+      controller: _scrollController,
       slivers: [
         SliverList(
           delegate: SliverChildBuilderDelegate(
-            (context, index) {
+                (context, index) {
               final event = events[index];
               return LayoutBuilder(
                 builder: (context, constraints) {
@@ -55,7 +221,7 @@ class HistoryPage extends StatelessWidget {
           ),
         ),
         const SliverToBoxAdapter(
-          child: AppFooter(), // Footer as part of the scrolling content
+          child: AppFooter(),
         ),
       ],
     );
@@ -187,7 +353,7 @@ class HistoryPage extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: AspectRatio(
-            aspectRatio: 16 / 9, // image ratio
+            aspectRatio: 16 / 9,
             child: FutureBuilder<String?>(
               future: Firestore.loadImageUrl(event.imageMobile),
               builder: (context, snapshot) {
@@ -231,7 +397,7 @@ class HistoryPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: alignLeft ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min, // Important: Avoid Infinite Scaling
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             Util.formatHtmlText(event.date),
@@ -265,7 +431,7 @@ class HistoryPage extends StatelessWidget {
   Widget buildLoadingWidget() => Center(child: CircularProgressIndicator());
 
   Widget buildErrorWidget() => Container(
-        color: Colors.grey[200],
-        child: const Icon(Icons.broken_image),
-      );
+    color: Colors.grey[200],
+    child: const Icon(Icons.broken_image),
+  );
 }

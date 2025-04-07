@@ -1,9 +1,11 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:n47_web/utils/Logger.dart';
+
 class EmailSender {
-  static Future<void> submitForm(String email, String message) async {
-    // 替换为你的 Firebase 函数 URL
+  static Future<void> submitForm(String name, String email, String subject, String message) async {
+    // Firebase URL
     final url = 'https://us-central1-n47web.cloudfunctions.net/sendemail';
 
     try {
@@ -11,7 +13,9 @@ class EmailSender {
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
+          'name': name,
           'email': email,
+          'subject': subject,
           'message': message,
         }),
       );
@@ -19,15 +23,15 @@ class EmailSender {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         if (jsonResponse['success'] == true) {
-          print('邮件发送成功');
+          Logger.d("send email success");
         } else {
-          print('邮件发送失败：${jsonResponse['error']}');
+          Logger.e("send email failed：${jsonResponse['error']}");
         }
       } else {
-        print('HTTP 请求失败：${response.statusCode}');
+        Logger.e("http request failed：${response.statusCode}");
       }
     } catch (e) {
-      print('发送邮件时发生错误：$e');
+      Logger.e("sending email failed：$e");
     }
   }
 }
