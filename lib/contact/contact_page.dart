@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:n47_web/contact/email_sender.dart';
 import 'package:n47_web/header/app_header.dart';
 import 'package:n47_web/l10n/generated/app_localizations.dart';
-import 'package:n47_web/utils/Logger.dart';
+import 'package:n47_web/utils/toast_util.dart';
 import '../footer/app_footer.dart';
 
 class ContactPage extends StatefulWidget {
@@ -38,37 +38,38 @@ class ContactPageState extends State<ContactPage> {
       _isLoading = true;
     });
 
-      try {
-        await EmailSender.submitForm(
-          _nameController.text,
-          _emailController.text,
-          _subjectController.text,
-          _messageController.text
-        );
+    try {
+      await EmailSender.submitForm(
+          _nameController.text, _emailController.text, _subjectController.text, _messageController.text);
 
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.sendSuccessDialog)),
-        );
+      if (!mounted) return;
+      ToastUtil.show(
+          context: context,
+          message: AppLocalizations.of(context)!.sendSuccessDialog,
+          type: ToastType.success,
+          position: ToastPosition.center,
+          duration: ToastUtil.shortDuration);
 
-        if (!mounted) return;
-        // Clear form after successful submission
-        _formKey.currentState!.reset();
-        _nameController.clear();
-        _emailController.clear();
-        _subjectController.clear();
-        _messageController.clear();
-        Logger.d("Form reset and controllers cleared.");
-      } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.sendFailedDialog)),
-        );
-      } finally {
-        if (mounted) {
-          setState(() => _isLoading = false);
-        }
+      if (!mounted) return;
+      // Clear form after successful submission
+      _formKey.currentState!.reset();
+      _nameController.clear();
+      _emailController.clear();
+      _subjectController.clear();
+      _messageController.clear();
+    } catch (e) {
+      if (!mounted) return;
+      ToastUtil.show(
+          context: context,
+          message: '${AppLocalizations.of(context)!.sendFailedDialog}: $e',
+          type: ToastType.error,
+          position: ToastPosition.center,
+          duration: ToastUtil.longDuration);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
+    }
   }
 
   @override
@@ -111,16 +112,16 @@ class ContactPageState extends State<ContactPage> {
                 Text(
                   AppLocalizations.of(context)!.contactTitle,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                 ),
                 const SizedBox(height: 20),
                 Text(
                   AppLocalizations.of(context)!.contactSubtitle,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.grey[700],
-                  ),
+                        color: Colors.grey[700],
+                      ),
                 ),
                 const SizedBox(height: 40),
                 Form(
@@ -164,8 +165,7 @@ class ContactPageState extends State<ContactPage> {
                                 if (value == null || value.isEmpty) {
                                   return AppLocalizations.of(context)!.emailEmptyError;
                                 }
-                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                    .hasMatch(value)) {
+                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
                                   return AppLocalizations.of(context)!.emailInvalidError;
                                 }
                                 return null;
@@ -227,20 +227,20 @@ class ContactPageState extends State<ContactPage> {
                           ),
                           child: _isLoading
                               ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
                               : Text(
-                            AppLocalizations.of(context)!.sendMessageButton,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                                  AppLocalizations.of(context)!.sendMessageButton,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                         ),
                       ),
                     ],

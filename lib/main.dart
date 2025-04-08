@@ -10,7 +10,6 @@ import 'package:n47_web/home/home_page.dart';
 import 'package:n47_web/l10n/generated/app_localizations.dart';
 import 'package:n47_web/navigation/AppRouter.dart';
 import 'package:n47_web/splash/splash_page.dart';
-import 'package:n47_web/utils/Logger.dart';
 
 import 'bloc/events_cubit.dart';
 import 'database/event.dart';

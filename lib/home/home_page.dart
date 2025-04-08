@@ -12,8 +12,8 @@ import '../database/event.dart';
 import '../footer/app_footer.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../bloc/events_cubit.dart';
-import '../utils/Logger.dart';
 import '../utils/Util.dart';
+import '../utils/logger_util.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -200,7 +200,7 @@ class HomePage extends StatelessWidget {
                   }
 
                   if (snapshot.hasError) {
-                    Logger.e('Image load failed: ${snapshot.error}');
+                    logger.e('Image load failed: ${snapshot.error}');
                     return buildErrorWidget();
                   }
 
@@ -261,7 +261,7 @@ class HomePage extends StatelessWidget {
                 }
 
                 if (snapshot.hasError) {
-                  Logger.e('Image load failed: ${snapshot.error}');
+                  logger.e('Image load failed: ${snapshot.error}');
                   return buildErrorWidget();
                 }
 

@@ -5,7 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-import '../utils/Logger.dart';
+import '../utils/logger_util.dart';
 
 class Firestore {
 
@@ -27,7 +27,7 @@ class Firestore {
         };
       }).toList();
     } catch (e) {
-      Logger.e('load firestore error: $e');
+      logger.e('load firestore error: $e');
       try {
         final jsonData = await rootBundle.loadString('assets/data/data.json');
         final List<dynamic> decodedData = jsonDecode(jsonData);
@@ -36,7 +36,7 @@ class Firestore {
             .map((item) => item as Map<String, dynamic>)
             .toList();
       } catch (e) {
-        Logger.e('load local data error: $e');
+        logger.e('load local data error: $e');
         return [];
       }
     }
@@ -46,10 +46,10 @@ class Firestore {
     try {
       final ref = FirebaseStorage.instanceFor().ref().child(imagePath);
       final url = await ref.getDownloadURL();
-      // Logger.d('Successfully loaded image URL: $url');
+      // logger.d('Successfully loaded image URL: $url');
       return url;
     } catch (e, stackTrace) {
-      Logger.e('Failed to load image: $e, error:$e, stackTrace: $stackTrace');
+      logger.e('Failed to load image: $e, error:$e, stackTrace: $stackTrace');
       return null;
     }
   }

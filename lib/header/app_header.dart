@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:n47_web/l10n/generated/app_localizations.dart';
 import 'package:n47_web/navigation/navi_item.dart';
-import 'package:n47_web/utils/Logger.dart';
 
 import '../home/home_page.dart';
 import '../navigation/AppRouter.dart';
+import '../utils/logger_util.dart';
 
 class AppHeader extends StatelessWidget {
   const AppHeader({Key? key}) : super(key: key);
@@ -31,7 +31,7 @@ class AppHeader extends StatelessWidget {
                     AppRouter.createFadeRoute(HomePage(), RouteSettings(name: '/')),
                   );
                 } else {
-                  Logger.d('Already on home page, ignoring click');
+                  logger.d('Already on home page, ignoring click');
                 }
               },
               child: Image.asset('assets/icons/n47_logo.png', width: 60, height: 60),
@@ -67,7 +67,6 @@ class AppHeader extends StatelessWidget {
                   title: AppLocalizations.of(context)!.naviAbout,
                   routeName: '/about',
                   onTap: () {
-                    Logger.d('About clicked');
                     Navigator.pushNamed(context, '/about');
                   },
                 ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/Logger.dart';
+import '../utils/logger_util.dart';
 
 class NavItem extends StatelessWidget {
   final String title;
@@ -19,7 +19,7 @@ class NavItem extends StatelessWidget {
         if (!isActive) {
           onTap();
         } else {
-          Logger.d('Already on $routeName page, ignoring click');
+          logger.d('Already on $routeName page, ignoring click');
         }
       },
       child: Text(

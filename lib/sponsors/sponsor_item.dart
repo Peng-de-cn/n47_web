@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../utils/logger_util.dart';
 
-import '../utils/Logger.dart';
 
 class SponsorItem extends StatelessWidget {
   final String imagePath;
@@ -60,7 +60,7 @@ class SponsorItem extends StatelessWidget {
         );
       }
     } catch (e) {
-      Logger.e('Could not launch $url: $e');
+      logger.e('Could not launch $url: $e');
     }
   }
 }

@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../utils/logger_util.dart';
 
-import 'package:n47_web/utils/Logger.dart';
 
 class EmailSender {
   static Future<void> submitForm(String name, String email, String subject, String message) async {
@@ -23,15 +23,15 @@ class EmailSender {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         if (jsonResponse['success'] == true) {
-          Logger.d("send email success");
+          logger.d("send email success");
         } else {
-          Logger.e("send email failed：${jsonResponse['error']}");
+          logger.e("send email failed：${jsonResponse['error']}");
         }
       } else {
-        Logger.e("http request failed：${response.statusCode}");
+        logger.e("http request failed：${response.statusCode}");
       }
     } catch (e) {
-      Logger.e("sending email failed：$e");
+      logger.e("sending email failed：$e");
     }
   }
 }

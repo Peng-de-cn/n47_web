@@ -8,8 +8,8 @@ import '../bloc/events_cubit.dart';
 import '../database/event.dart';
 import '../firebase/fire_store.dart';
 import '../footer/app_footer.dart';
-import '../utils/Logger.dart';
 import '../utils/Util.dart';
+import '../utils/logger_util.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -79,7 +79,7 @@ class HistoryPageState extends State<HistoryPage> {
         return DateTime(int.parse(year), month, int.parse(day));
       }
     } catch (e) {
-      Logger.e('Error parsing date: $dateStr - $e');
+      logger.e('Error parsing date: $dateStr - $e');
     }
     return DateTime.now();
   }
@@ -307,7 +307,7 @@ class HistoryPageState extends State<HistoryPage> {
                   }
 
                   if (snapshot.hasError) {
-                    Logger.e('Image load failed: ${snapshot.error}');
+                    logger.e('Image load failed: ${snapshot.error}');
                     return buildErrorWidget();
                   }
 
@@ -366,7 +366,7 @@ class HistoryPageState extends State<HistoryPage> {
                 }
 
                 if (snapshot.hasError) {
-                  Logger.e('Image load failed: ${snapshot.error}');
+                  logger.e('Image load failed: ${snapshot.error}');
                   return buildErrorWidget();
                 }
 

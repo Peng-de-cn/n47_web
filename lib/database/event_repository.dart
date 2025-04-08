@@ -2,8 +2,7 @@ import 'dart:convert';
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:n47_web/database/event.dart';
-
-import '../utils/Logger.dart';
+import '../utils/logger_util.dart';
 
 class EventRepository {
   static const _eventsBox = 'events';
@@ -25,9 +24,9 @@ class EventRepository {
 
     final newHash = _calculateListHash(events);
     final lastHash = keyBox.get('eventsHash', defaultValue: -1);
-
+    logger.d("test");
     if (lastHash == newHash) {
-      Logger.d("same json, don´t import");
+      logger.d("same json, don´t import");
       return;
     }
 
