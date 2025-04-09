@@ -109,8 +109,8 @@ class SponsorsPage extends StatelessWidget {
               ),
 
               const SizedBox(height: 60),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalTextPadding),
+              SizedBox(
+                width: double.infinity,
                 child: const AppFooter(),
               ),
             ],

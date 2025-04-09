@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../utils/toast_util.dart';
 
-class AppFooter extends StatelessWidget {
-  const AppFooter({Key? key}) : super(key: key);
+class AppFooter extends StatefulWidget {
+  const AppFooter({super.key});
+
+  @override
+  AppFooterSate createState() => AppFooterSate();
+}
+
+class AppFooterSate extends State<AppFooter> {
 
   void _launchEmail() async {
     final Uri emailLaunchUri = Uri(
@@ -15,23 +22,32 @@ class AppFooter extends StatelessWidget {
     }
   }
 
-  Future<void> _launchUrl(BuildContext context, String url) async {
+  Future<void> _launchUrl(String url) async {
     try {
       if (await canLaunchUrl(Uri.parse(url))) {
         await launchUrl(Uri.parse(url));
       }
     } catch (e) {
-      final errorMessage = '${AppLocalizations.of(context)!.urlError}: $e';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
+      if (!mounted) return;
+      ToastUtil.show(
+          context: context,
+          message: '${AppLocalizations.of(context)!.urlError}: $e',
+          type: ToastType.error,
+          position: ToastPosition.center,
+          duration: ToastUtil.longDuration);
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: Color(0xFFF5F5F7),
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -97,6 +113,7 @@ class AppFooter extends StatelessWidget {
         MouseRegion(
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: _launchEmail,
             child: const Text(
               'info@n47.eu',
@@ -168,7 +185,7 @@ class AppFooter extends StatelessWidget {
           alignment: WrapAlignment.center,
           spacing: 20,
           runSpacing: 15,
-          children: buildSocialIcons(context),
+          children: buildSocialIcons(),
         ),
         const SizedBox(height: 40),
         Text(
@@ -182,14 +199,14 @@ class AppFooter extends StatelessWidget {
     );
   }
 
-  List<Widget> buildSocialIcons(BuildContext context) {
+  List<Widget> buildSocialIcons() {
     return [
-      buildSocialIcon(context, 'assets/icons/icon_instagram.png', 'https://www.instagram.com/n47.eu/'),
-      buildSocialIcon(context, 'assets/icons/icon_youtube.png', 'https://www.youtube.com/channel/UCVSaaojGTCzfQCWY2z-_CFQ/featured'),
-      buildSocialIcon(context, 'assets/icons/icon_rednote.png', null, onTap: () {
+      buildSocialIcon('assets/icons/icon_instagram.png', 'https://www.instagram.com/n47.eu/'),
+      buildSocialIcon('assets/icons/icon_youtube.png', 'https://www.youtube.com/channel/UCVSaaojGTCzfQCWY2z-_CFQ/featured'),
+      buildSocialIcon('assets/icons/icon_rednote.png', null, onTap: () {
         showRedNoteDialog(context);
       }),
-      buildSocialIcon(context, 'assets/icons/icon_wechat.png', null, onTap: () {
+      buildSocialIcon('assets/icons/icon_wechat.png', null, onTap: () {
         showWeChatDialog(context);
       }),
 
@@ -197,13 +214,12 @@ class AppFooter extends StatelessWidget {
   }
 
   Widget buildSocialIcon(
-      BuildContext context,
       String assetPath,
       String? url, {
         VoidCallback? onTap,
       }) {
     return GestureDetector(
-      onTap: onTap ?? (url != null ? () => _launchUrl(context, url) : null),
+      onTap: onTap ?? (url != null ? () => _launchUrl(url) : null),
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: Image.asset(
@@ -216,11 +232,11 @@ class AppFooter extends StatelessWidget {
     );
   }
 
-  Widget buildLink(BuildContext context, String text, String url) {
+  Widget buildLink(String text, String url) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () => _launchUrl(context, url),
+        onTap: () => _launchUrl(url),
         child: Text(
           text,
           style: const TextStyle(
