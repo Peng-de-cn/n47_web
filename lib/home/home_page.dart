@@ -147,7 +147,7 @@ class HomePage extends StatelessWidget {
                 : CrossAxisAlignment.end,
             children: [
               Text(
-                Util.formatHtmlText(event.date),
+                Util.formatHtmlText(event.dateText),
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -297,7 +297,7 @@ class HomePage extends StatelessWidget {
         mainAxisSize: MainAxisSize.min, // Important: Avoid Infinite Scaling
         children: [
           Text(
-            Util.formatHtmlText(event.date),
+            Util.formatHtmlText(event.dateText),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,

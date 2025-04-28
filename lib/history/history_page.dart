@@ -251,7 +251,7 @@ class HistoryPageState extends State<HistoryPage> {
             crossAxisAlignment: alignLeft ? CrossAxisAlignment.start : CrossAxisAlignment.end,
             children: [
               Text(
-                Util.formatHtmlText(event.date),
+                Util.formatHtmlText(event.dateText),
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -397,7 +397,7 @@ class HistoryPageState extends State<HistoryPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            Util.formatHtmlText(event.date),
+            Util.formatHtmlText(event.dateText),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
