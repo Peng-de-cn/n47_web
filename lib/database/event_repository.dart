@@ -18,13 +18,11 @@ class EventRepository {
 
   static Future<void> importHistoryEvents(List<Map<String, dynamic>> historyEvents) async {
     final events = historyEvents.map((data) => Event.fromJson(data)).toList();
-
     final eventsBox = Hive.box<Event>(_historyEventsBox);
     final keyBox = Hive.box(_keyBox);
 
     final newHash = _calculateListHash(events);
     final lastHash = keyBox.get('eventsHash', defaultValue: -1);
-    logger.d("test");
     if (lastHash == newHash) {
       logger.d("same json, don´t import");
       return;

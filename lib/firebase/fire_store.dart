@@ -11,10 +11,7 @@ class Firestore {
 
   static Future<List<Map<String, dynamic>>> fetchHistoryEvents() async {
     try {
-      final firestore = FirebaseFirestore.instanceFor(
-          app: Firebase.app(),
-          databaseId: 'n47events'
-      );
+      final firestore = FirebaseFirestore.instance;
 
       final querySnapshot = await firestore
           .collection('history')
@@ -31,7 +28,6 @@ class Firestore {
       try {
         final jsonData = await rootBundle.loadString('assets/data/data.json');
         final List<dynamic> decodedData = jsonDecode(jsonData);
-
         return decodedData
             .map((item) => item as Map<String, dynamic>)
             .toList();

@@ -1,3 +1,4 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,10 +9,12 @@ import 'package:n47_web/home/home_page.dart';
 import 'package:n47_web/l10n/generated/app_localizations.dart';
 import 'package:n47_web/navigation/AppRouter.dart';
 import 'package:n47_web/splash/splash_page.dart';
+import 'package:n47_web/utils/logger_util.dart';
 import 'bloc/events_cubit.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase/fire_store.dart';
 import 'firebase_options.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,10 +42,23 @@ class N47App extends StatelessWidget {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    await activateAppCheck();
+
     await EventRepository.init();
 
     List<Map<String, dynamic>> historyEvents = await Firestore.fetchHistoryEvents();
     await EventRepository.importHistoryEvents(historyEvents);
+  }
+
+  Future<void> activateAppCheck() async {
+    await FirebaseAppCheck.instance.activate(
+      webProvider: ReCaptchaV3Provider('6LeJKCcrAAAAAB5_i37B7M-maDo21Zqao9mrzZ07'),
+    );
+
+    await FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(true);
+
+    // final token = await FirebaseAppCheck.instance.getToken();
+    // logger.d('App Check Token: $token');
   }
 
   Widget buildAppContent() {
