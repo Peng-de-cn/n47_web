@@ -10,8 +10,9 @@ import 'package:n47_web/l10n/generated/app_localizations.dart';
 import 'package:n47_web/navigation/AppRouter.dart';
 import 'package:n47_web/splash/splash_page.dart';
 import 'package:n47_web/utils/logger_util.dart';
-import 'bloc/events_cubit.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'bloc/future_events_cubit.dart';
+import 'bloc/history_events_cubit.dart';
 import 'firebase/fire_store.dart';
 import 'firebase_options.dart';
 
@@ -46,6 +47,9 @@ class N47App extends StatelessWidget {
 
     await EventRepository.init();
 
+    List<Map<String, dynamic>> futureEvents = await Firestore.fetchFutureEvents();
+    await EventRepository.importFutureEvents(futureEvents);
+
     List<Map<String, dynamic>> historyEvents = await Firestore.fetchHistoryEvents();
     await EventRepository.importHistoryEvents(historyEvents);
   }
@@ -65,7 +69,8 @@ class N47App extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => HomeBloc()),
-        BlocProvider(create: (_) => EventsCubit()),
+        BlocProvider(create: (_) => FutureEventsCubit()),
+        BlocProvider(create: (_) => HistoryEventsCubit()),
       ],
       child: MaterialApp(
           title: 'N47',

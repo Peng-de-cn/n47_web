@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:n47_web/header/app_header.dart';
 import 'package:n47_web/l10n/generated/app_localizations.dart';
-import '../bloc/events_cubit.dart';
+import '../bloc/history_events_cubit.dart';
 import '../database/event.dart';
 import '../firebase/fire_store.dart';
 import '../footer/app_footer.dart';
@@ -37,10 +37,7 @@ class HistoryPageState extends State<HistoryPage> {
   }
 
   void _loadAvailableSeasons() {
-    final events = context.read<EventsCubit>().state;
-
-    // 按日期排序事件
-    events.sort((a, b) => _parseDate(a.date).compareTo(_parseDate(b.date)));
+    final events = context.read<HistoryEventsCubit>().state;
 
     // 分组到各个雪季
     final seasonMap = <String, List<Event>>{};

@@ -9,6 +9,35 @@ import '../utils/logger_util.dart';
 
 class Firestore {
 
+  static Future<List<Map<String, dynamic>>> fetchFutureEvents() async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+
+      final querySnapshot = await firestore
+          .collection('future')
+          .get();
+
+      return querySnapshot.docs.map((doc) {
+        return {
+          'id': doc.id,
+          ...doc.data(),
+        };
+      }).toList();
+    } catch (e) {
+      logger.e('load firestore error: $e');
+      try {
+        final jsonData = await rootBundle.loadString('assets/data/future.json');
+        final List<dynamic> decodedData = jsonDecode(jsonData);
+        return decodedData
+            .map((item) => item as Map<String, dynamic>)
+            .toList();
+      } catch (e) {
+        logger.e('load local data error: $e');
+        return [];
+      }
+    }
+  }
+
   static Future<List<Map<String, dynamic>>> fetchHistoryEvents() async {
     try {
       final firestore = FirebaseFirestore.instance;
@@ -26,7 +55,7 @@ class Firestore {
     } catch (e) {
       logger.e('load firestore error: $e');
       try {
-        final jsonData = await rootBundle.loadString('assets/data/data.json');
+        final jsonData = await rootBundle.loadString('assets/data/history.json');
         final List<dynamic> decodedData = jsonDecode(jsonData);
         return decodedData
             .map((item) => item as Map<String, dynamic>)

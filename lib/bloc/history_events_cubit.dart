@@ -1,12 +1,11 @@
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../database/event.dart';
 import '../database/event_repository.dart';
 import '../utils/logger_util.dart';
 
-class EventsCubit extends Cubit<List<Event>> {
+class HistoryEventsCubit extends Cubit<List<Event>> {
 
-  EventsCubit() : super([]) {
+  HistoryEventsCubit() : super([]) {
     loadEvents();
   }
 
@@ -15,7 +14,7 @@ class EventsCubit extends Cubit<List<Event>> {
       final events = EventRepository.getHistoryEventsSortedByDate();
       emit(events);
     } catch (e) {
-      logger.e('Failed to load events: $e');
+      logger.e('Failed to load history events: $e');
       emit([]);
     }
   }

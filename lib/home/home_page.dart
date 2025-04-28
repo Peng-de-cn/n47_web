@@ -8,10 +8,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:n47_web/firebase/fire_store.dart';
 import 'package:n47_web/header/app_header.dart';
 import 'package:n47_web/home/home_bloc.dart';
+import '../bloc/future_events_cubit.dart';
 import '../database/event.dart';
 import '../footer/app_footer.dart';
 import '../l10n/generated/app_localizations.dart';
-import '../bloc/events_cubit.dart';
 import '../utils/Util.dart';
 import '../utils/logger_util.dart';
 
@@ -21,7 +21,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final events = context.read<EventsCubit>().state;
+    final events = context.read<FutureEventsCubit>().state;
     return Scaffold(
       body: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
