@@ -4,8 +4,44 @@
     "title": "25-26 season opening",
     "date": "2025-11-01",
     "dateText": "01 November 2025",
-    "description": "We're excited to announce that we will organize a 25-26 ski season Opening Event at November 1st 2024 at ski resort Pitztal Gletscher, Austria.\n \nCome and join the raffles！Generous gifts are waiting for you!",
+    "description": "We're excited to announce that we will organize a 25-26 ski season Opening Event at November 1st 2025 at ski resort Pitztal Gletscher, Austria.\n \nCome and join the raffles！Generous gifts are waiting for you!",
     "imageWeb": "future_web/Season_open.jpg",
     "imageMobile": "future_mobile/Season_open.jpg"
+  },
+  {
+    "id": "2",
+    "title": "N47 Snowboard Park Camp",
+    "date": "2025-11-15",
+    "dateText": "monthly from November 2024 to May 2025",
+    "description": "Join our freestyle training camp designed for all skill levels. Learn park basics, improve your tricks, and ride with our experienced coaches in a fun and friendly environment. Whether you're hitting your first rail or dialing in your spins, this camp is your next step in freestyle progression.",
+    "imageWeb": "future_web/",
+    "imageMobile": "future_mobile/"
+  },
+  {
+    "id": "3",
+    "title": "Christmas Ski Carnival",
+    "date": "2025-12-24",
+    "dateText": "20-28 December 2025",
+    "description": "Celebrate Christmas in the Dolomites with a week of skiing and snowboarding. Enjoy exclusive gifts and unforgettable memories.",
+    "imageWeb": "future_web/Christmas.jpg",
+    "imageMobile": "future_mobile/Christmas.jpg"
+  },
+  {
+    "id": "4",
+    "title": "Nitro & N47 European Chinese Snowboard Park Challenge (Men & Women)",
+    "date": "2026-02-21",
+    "dateText": "21 February 2026",
+    "description": "The competition is scheduled to take place in ski resort Mayrhofen, Austria in February. Generous prizes sponsored by Nitro will be awarded to the participants.",
+    "imageWeb": "future_web/Snowpark_challenge_2526.jpg",
+    "imageMobile": "future_mobile/Snowpark_challenge_2526.jpg"
+  },
+  {
+    "id": "5",
+    "title": "Nitro 26-27 New Snowboard Test Event",
+    "date": "2026-03-14",
+    "dateText": "14-15 March 2026",
+    "description": "Be the first to ride Nitro’s brand-new 26-27 snowboard lineup — for free! Join us this March for an exclusive on-snow test event, open to all riders. Try out the latest shapes, tech, and designs before anyone else.",
+    "imageWeb": "future_web/",
+    "imageMobile": "future_mobile/"
   }
 ]
