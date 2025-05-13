@@ -8,7 +8,8 @@ import '../bloc/history_events_cubit.dart';
 import '../database/event.dart';
 import '../firebase/fire_store.dart';
 import '../footer/app_footer.dart';
-import '../utils/Util.dart';
+import '../refreshable/refreshable_page.dart';
+import '../utils/util.dart';
 import '../utils/logger_util.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -144,15 +145,15 @@ class HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     final currentEvents = _getEventsForCurrentSeason();
 
-    return Scaffold(
-      body: Stack(
+    return RefreshablePage(
+      child: Stack(
         children: [
           Container(
             color: Colors.white,
           ),
           const AppHeader(),
           Positioned(
-            top: 100,
+            top: Util.isMobile(context) ? 60 : 100,
             left: 0,
             right: 0,
             bottom: 0,
@@ -172,23 +173,26 @@ class HistoryPageState extends State<HistoryPage> {
 
   Widget _buildSeasonSelector() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      padding: EdgeInsets.symmetric(vertical: Util.isMobile(context) ? 6.0 : 16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           IconButton(
-            icon: const Icon(Icons.chevron_left),
+            icon: Icon(Icons.chevron_left,
+                size: Util.isMobile(context) ? 28 : 32),
             onPressed: _currentSeasonIndex > 0 ? _goToPreviousSeason : null,
+            padding: Util.isMobile(context) ? EdgeInsets.all(8) : EdgeInsets.all(12),
           ),
           Text(
             '${_availableSeasons[_currentSeasonIndex]} ${AppLocalizations.of(context)!.historyTab}',
-            style: const TextStyle(
-              fontSize: 24,
+            style: TextStyle(
+              fontSize: Util.isMobile(context) ? 18 : 24,
               fontWeight: FontWeight.bold,
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.chevron_right),
+            icon: Icon(Icons.chevron_right,
+                size: Util.isMobile(context) ? 28 : 32),
             onPressed: _currentSeasonIndex < _availableSeasons.length - 1 ? _goToNextSeason : null,
           ),
         ],

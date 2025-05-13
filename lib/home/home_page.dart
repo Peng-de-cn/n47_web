@@ -12,7 +12,8 @@ import '../bloc/future_events_cubit.dart';
 import '../database/event.dart';
 import '../footer/app_footer.dart';
 import '../l10n/generated/app_localizations.dart';
-import '../utils/Util.dart';
+import '../refreshable/refreshable_page.dart';
+import '../utils/util.dart';
 import '../utils/logger_util.dart';
 
 class HomePage extends StatelessWidget {
@@ -22,8 +23,8 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final events = context.read<FutureEventsCubit>().state;
-    return Scaffold(
-      body: BlocBuilder<HomeBloc, HomeState>(
+    return RefreshablePage(
+      child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
           return Stack(
             children: [
@@ -55,21 +56,23 @@ class HomePage extends StatelessWidget {
       slivers: [
         SliverToBoxAdapter(
           child: Container(
-            padding: EdgeInsets.only(top: 200, bottom: 500),
+            padding: EdgeInsets.only(
+              top: Util.isMobile(context) ? 100 : 200,
+              bottom: Util.isMobile(context) ? 200 : 500,),
             child: Center(
               child: Text(
                 AppLocalizations.of(context)!.appTitle,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.rajdhani(
-                    fontSize: 64,
+                    fontSize: Util.isMobile(context) ? 36 : 64,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
-                    letterSpacing: 1.5,
+                    letterSpacing: Util.isMobile(context) ? 0.8 : 1.5,
                     shadows: [
                       Shadow(
                           color: Color.fromRGBO(0, 0, 0, 0.3),
                           blurRadius: 4,
-                          offset: Offset(2, 2)
+                          offset: Offset(Util.isMobile(context) ? 1 : 2, Util.isMobile(context) ? 1 : 2)
                       )
                     ]
                 ),
@@ -271,7 +274,7 @@ class HomePage extends StatelessWidget {
                 }
 
                 return CachedNetworkImage(
-                  imageUrl: snapshot.data!,
+                  imageUrl: url,
                   fit: BoxFit.cover,
                   placeholder: (_, __) => buildLoadingWidget(),
                   errorWidget: (_, url, error) => buildErrorWidget(),
@@ -289,7 +292,7 @@ class HomePage extends StatelessWidget {
 
   Widget buildMobileTextContent(Event event, bool alignLeft) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         crossAxisAlignment: alignLeft
             ? CrossAxisAlignment.start

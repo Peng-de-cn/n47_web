@@ -4,6 +4,8 @@ import 'package:n47_web/header/app_header.dart';
 import 'package:n47_web/l10n/generated/app_localizations.dart';
 import 'package:n47_web/utils/toast_util.dart';
 import '../footer/app_footer.dart';
+import '../refreshable/refreshable_page.dart';
+import '../utils/util.dart';
 
 class ContactPage extends StatefulWidget {
   const ContactPage({super.key});
@@ -73,15 +75,15 @@ class ContactPageState extends State<ContactPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
+    return RefreshablePage(
+      child: Stack(
         children: [
           Container(
             color: Colors.white,
           ),
           const AppHeader(),
           Positioned(
-            top: 100,
+            top: Util.isMobile(context) ? 60 : 100,
             left: 0,
             right: 0,
             bottom: 0,

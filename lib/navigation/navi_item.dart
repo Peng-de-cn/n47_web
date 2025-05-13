@@ -6,8 +6,15 @@ class NavItem extends StatelessWidget {
   final String title;
   final String routeName;
   final VoidCallback onTap;
+  final bool compact;
 
-  const NavItem({super.key, required this.title, required this.routeName, required this.onTap});
+  const NavItem({
+    super.key,
+    required this.title,
+    required this.routeName,
+    required this.onTap,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +29,13 @@ class NavItem extends StatelessWidget {
           logger.d('Already on $routeName page, ignoring click');
         }
       },
-      child: Text(
-        title,
-        style: TextStyle(
-          color: isActive ? Colors.grey : Colors.black,
-          fontSize: 16,
-          fontWeight: FontWeight.bold
+      child: Padding(
+        padding: compact
+            ? const EdgeInsets.symmetric(horizontal: 6, vertical: 4)
+            : const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Text(
+          title,
+          style: TextStyle(color: isActive ? Colors.grey : Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
     );

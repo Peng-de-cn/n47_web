@@ -4,21 +4,23 @@ import 'package:google_fonts/google_fonts.dart';
 import '../footer/app_footer.dart';
 import '../header/app_header.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../refreshable/refreshable_page.dart';
+import '../utils/util.dart';
 
 class AboutPage extends StatelessWidget {
-  const AboutPage({Key? key}) : super(key: key);
+  const AboutPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
+    return RefreshablePage(
+      child: Stack(
         children: [
           Container(
             color: Colors.white,
           ),
           const AppHeader(),
           Positioned(
-            top: 100,
+            top: Util.isMobile(context) ? 60 : 100,
             left: 0,
             right: 0,
             bottom: 0,
