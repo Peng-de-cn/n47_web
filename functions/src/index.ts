@@ -1,15 +1,25 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { defineSecret } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
+import { getAppCheck } from 'firebase-admin/app-check';
 import express from 'express';
 import sgMail from '@sendgrid/mail';
 import cors from 'cors';
 
-// 配置常量
-const MAX_RETRIES = 3;
-const RETRY_DELAY_MS = 2000;
-const FUNCTION_TIMEOUT_SEC = 60;
 const FUNCTION_MEMORY = '512MiB';
+
+// 配置常量
+const CONFIG = {
+  MAX_RETRIES: 3,
+  RETRY_DELAY_MS: 2000,
+  FUNCTION_TIMEOUT_SEC: 60,
+  FUNCTION_MEMORY: '512MiB' as const,
+  ALLOWED_ORIGINS: ['https://n47.web.app'],
+  RATE_LIMIT: {
+    WINDOW_MS: 15 * 60 * 1000, // 15分钟
+    MAX_REQUESTS: 100, // 每个IP每15分钟最多100次请求
+  },
+};
 
 // 定义密钥参数
 const sendgridKey = defineSecret('SENDGRID_API_KEY');
@@ -19,23 +29,110 @@ const fromEmail = defineSecret('SENDGRID_FROM_EMAIL');
 admin.initializeApp();
 const app = express();
 
+// 内存中的简单限流缓存
+const requestCounts = new Map<string, number>();
+
 // 中间件配置
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
   origin: true,
   methods: ['POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
+  allowedHeaders: ['Content-Type', 'X-Firebase-AppCheck'],
   maxAge: 86400
 }));
+
+// 限流中间件
+app.use((req, res, next) => {
+  const clientIp = req.ip || req.connection.remoteAddress || '';
+  const now = Date.now();
+  
+  // 清理过期记录
+  requestCounts.forEach((timestamp, ip) => {
+    if (now - timestamp > CONFIG.RATE_LIMIT.WINDOW_MS) {
+      requestCounts.delete(ip);
+    }
+  });
+
+  const count = requestCounts.get(clientIp) || 0;
+  if (count >= CONFIG.RATE_LIMIT.MAX_REQUESTS) {
+    return res.status(429).json({
+      success: false,
+      error: '请求过于频繁，请稍后再试',
+    });
+  }
+
+  requestCounts.set(clientIp, count + 1);
+  next();
+});
+
+// App Check 验证中间件
+const verifyAppCheck = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  // 健康检查端点不需要验证
+  if (req.path === '/healthz') return next();
+
+  const appCheckToken = req.header('X-Firebase-AppCheck');
+  
+  if (!appCheckToken) {
+    console.warn('缺少AppCheck Token');
+    return res.status(401).json({
+      success: false,
+      error: '未经授权的请求',
+    });
+  }
+
+  try {
+    await getAppCheck().verifyToken(appCheckToken);
+    next();
+  } catch (error) {
+    console.error('AppCheck验证失败:', error);
+    return res.status(401).json({
+      success: false,
+      error: '无效的AppCheck Token',
+    });
+  }
+};
+
+app.use(verifyAppCheck);
 
 // 健康检查端点
 app.get('/healthz', (req, res) => {
   res.status(200).json({ 
     status: 'healthy',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    version: process.env.K_REVISION || 'local',
   });
 });
+
+// 验证邮件内容的中间件
+const validateEmailRequest = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const { name, email, subject, message } = req.body;
+  
+  if (!name || !email || !subject || !message) {
+    return res.status(400).json({
+      success: false,
+      error: '缺少必填参数',
+      required: ['name', 'email', 'subject', 'message']
+    });
+  }
+
+  // 简单的邮箱格式验证
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      success: false,
+      error: '无效的邮箱格式',
+    });
+  }
+
+  // 防止XSS攻击，清理输入
+  req.body.cleanName = name.toString().substring(0, 100);
+  req.body.cleanEmail = email.toString().substring(0, 100);
+  req.body.cleanSubject = subject.toString().substring(0, 200);
+  req.body.cleanMessage = message.toString().substring(0, 2000);
+  
+  next();
+};
 
 /**
  * 带指数退避的邮件发送重试机制
@@ -46,8 +143,8 @@ app.get('/healthz', (req, res) => {
  */
 const sendEmailWithRetry = async (
   msg: sgMail.MailDataRequired,
-  retriesLeft = MAX_RETRIES,
-  baseDelay = RETRY_DELAY_MS
+  retriesLeft = CONFIG.MAX_RETRIES,
+  baseDelay = CONFIG.RETRY_DELAY_MS
 ): Promise<{ success: boolean; attempts: number; error?: string }> => {
   let lastError: unknown = null;
   
@@ -125,7 +222,7 @@ app.post('/', async (req, res) => {
 
     // 4. 构造邮件
     const msg: sgMail.MailDataRequired = {
-      to: "zhangpeng.snowboard@gmail.com",
+      to: "info@n47.eu",
       from: {
         email: senderEmail,
         name: "N47 web" // 发件人名称
@@ -190,7 +287,7 @@ app.use((req, res) => {
 // 导出云函数
 export const sendemail = onRequest({
   region: 'us-central1',
-  timeoutSeconds: FUNCTION_TIMEOUT_SEC,
-  memory: FUNCTION_MEMORY,
+  timeoutSeconds: CONFIG.FUNCTION_TIMEOUT_SEC,
+  memory: CONFIG.FUNCTION_MEMORY,
   secrets: [sendgridKey, fromEmail]
 }, app);

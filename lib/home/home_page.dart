@@ -271,7 +271,7 @@ class HomePage extends StatelessWidget {
                 }
 
                 return CachedNetworkImage(
-                  imageUrl: url,
+                  imageUrl: snapshot.data!,
                   fit: BoxFit.cover,
                   placeholder: (_, __) => buildLoadingWidget(),
                   errorWidget: (_, url, error) => buildErrorWidget(),
