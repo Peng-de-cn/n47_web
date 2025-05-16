@@ -51,8 +51,7 @@ class HistoryPageState extends State<HistoryPage> {
     }
 
     // 获取所有雪季并按时间排序(最新的在前)
-    _availableSeasons = seasonMap.keys.toList()
-      ..sort((a, b) => _parseSeason(b).compareTo(_parseSeason(a)));
+    _availableSeasons = seasonMap.keys.toList()..sort((a, b) => _parseSeason(b).compareTo(_parseSeason(a)));
 
     // 保存每个雪季的事件列表
     _seasonalEvents = _availableSeasons.map((s) => seasonMap[s]!).toList();
@@ -84,8 +83,18 @@ class HistoryPageState extends State<HistoryPage> {
 
   int _monthNameToNumber(String month) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
     ];
     return months.indexWhere((m) => m.startsWith(month)) + 1;
   }
@@ -96,13 +105,11 @@ class HistoryPageState extends State<HistoryPage> {
 
     if (month >= 10) {
       return '${year.toString().substring(2)}/${(year + 1).toString().substring(2)}';
-    }
-    else if (month <= 5) {
+    } else if (month <= 5) {
       return '${(year - 1).toString().substring(2)}/${year.toString().substring(2)}';
     }
     return '${(year - 1).toString().substring(2)}/${year.toString().substring(2)}';
   }
-
 
   DateTime _parseSeason(String season) {
     final parts = season.split('/');
@@ -178,8 +185,7 @@ class HistoryPageState extends State<HistoryPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           IconButton(
-            icon: Icon(Icons.chevron_left,
-                size: Util.isMobile(context) ? 28 : 32),
+            icon: Icon(Icons.chevron_left, size: Util.isMobile(context) ? 28 : 32),
             onPressed: _currentSeasonIndex > 0 ? _goToPreviousSeason : null,
             padding: Util.isMobile(context) ? EdgeInsets.all(8) : EdgeInsets.all(12),
           ),
@@ -191,8 +197,7 @@ class HistoryPageState extends State<HistoryPage> {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.chevron_right,
-                size: Util.isMobile(context) ? 28 : 32),
+            icon: Icon(Icons.chevron_right, size: Util.isMobile(context) ? 28 : 32),
             onPressed: _currentSeasonIndex < _availableSeasons.length - 1 ? _goToNextSeason : null,
           ),
         ],
@@ -206,7 +211,7 @@ class HistoryPageState extends State<HistoryPage> {
       slivers: [
         SliverList(
           delegate: SliverChildBuilderDelegate(
-                (context, index) {
+            (context, index) {
               final event = events[index];
               return LayoutBuilder(
                 builder: (context, constraints) {
@@ -230,15 +235,27 @@ class HistoryPageState extends State<HistoryPage> {
 
   Widget buildDesktopLayout(int index, Event event) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 20.0),
       child: Row(
         children: [
           if (index % 2 == 0) ...[
-            buildDesktopTextContent(event, true),
-            buildDesktopImageContent(event),
+            Expanded(
+              flex: 3,
+              child: buildDesktopTextContent(event, true),
+            ),
+            Expanded(
+              flex: 2,
+              child: buildDesktopImageContent(event),
+            ),
           ] else ...[
-            buildDesktopImageContent(event),
-            buildDesktopTextContent(event, false),
+            Expanded(
+              flex: 2,
+              child: buildDesktopImageContent(event),
+            ),
+            Expanded(
+              flex: 3,
+              child: buildDesktopTextContent(event, false),
+            ),
           ],
         ],
       ),
@@ -292,12 +309,104 @@ class HistoryPageState extends State<HistoryPage> {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {},
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 15,
+                  offset: const Offset(0, 10),
+                ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 5,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: AspectRatio(
+                aspectRatio: 3 / 4,
+                child: FutureBuilder<String?>(
+                  future: Firestore.loadImageUrl(event.imageWeb),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return AnimatedOpacity(
+                        opacity: 0.5,
+                        duration: const Duration(milliseconds: 300),
+                        child: buildLoadingWidget(),
+                      );
+                    }
+
+                    if (snapshot.hasError) {
+                      logger.e('Image load failed: ${snapshot.error}');
+                      return buildErrorWidget();
+                    }
+
+                    final url = snapshot.data;
+                    if (url == null || url.isEmpty) {
+                      return buildErrorWidget();
+                    }
+
+                    return CachedNetworkImage(
+                      imageUrl: url,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => buildLoadingWidget(),
+                      errorWidget: (_, url, error) => buildErrorWidget(),
+                      maxWidthDiskCache: kIsWeb ? null : 1024,
+                      fadeInDuration: const Duration(milliseconds: 200),
+                      imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildMobileLayout(int index, Event event, int eventsLength) {
+    return Column(
+      children: [
+        buildMobileImageContent(event),
+        buildMobileTextContent(event, true),
+        if (index != eventsLength - 1) const Divider(height: 40),
+      ],
+    );
+  }
+
+  Widget buildMobileImageContent(Event event) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {},
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 15,
+                offset: const Offset(0, 10),
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: AspectRatio(
-              aspectRatio: 3 / 4,
+              aspectRatio: 4 / 3,
               child: FutureBuilder<String?>(
-                future: Firestore.loadImageUrl(event.imageWeb),
+                future: Firestore.loadImageUrl(event.imageMobile),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return AnimatedOpacity(
@@ -335,67 +444,9 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildMobileLayout(int index, Event event, int eventsLength) {
-    return Column(
-      children: [
-        buildMobileImageContent(event),
-        buildMobileTextContent(event, true),
-        if (index != eventsLength - 1) const Divider(height: 40),
-      ],
-    );
-  }
-
-  Widget buildMobileImageContent(Event event) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {},
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: FutureBuilder<String?>(
-              future: Firestore.loadImageUrl(event.imageMobile),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return AnimatedOpacity(
-                    opacity: 0.5,
-                    duration: const Duration(milliseconds: 300),
-                    child: buildLoadingWidget(),
-                  );
-                }
-
-                if (snapshot.hasError) {
-                  logger.e('Image load failed: ${snapshot.error}');
-                  return buildErrorWidget();
-                }
-
-                final url = snapshot.data;
-                if (url == null || url.isEmpty) {
-                  return buildErrorWidget();
-                }
-
-                return CachedNetworkImage(
-                  imageUrl: url,
-                  fit: BoxFit.cover,
-                  placeholder: (_, __) => buildLoadingWidget(),
-                  errorWidget: (_, url, error) => buildErrorWidget(),
-                  maxWidthDiskCache: kIsWeb ? null : 1024,
-                  fadeInDuration: const Duration(milliseconds: 200),
-                  imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
-                );
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget buildMobileTextContent(Event event, bool alignLeft) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
       child: Column(
         crossAxisAlignment: alignLeft ? CrossAxisAlignment.start : CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
@@ -432,7 +483,7 @@ class HistoryPageState extends State<HistoryPage> {
   Widget buildLoadingWidget() => Center(child: CircularProgressIndicator());
 
   Widget buildErrorWidget() => Container(
-    color: Colors.grey[200],
-    child: const Icon(Icons.broken_image),
-  );
+        color: Colors.grey[200],
+        child: const Icon(Icons.broken_image),
+      );
 }
