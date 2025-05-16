@@ -14,8 +14,8 @@
     "date": "2025-11-15",
     "dateText": "monthly from November 2024 to May 2025",
     "description": "Join our freestyle training camp designed for all skill levels. Learn park basics, improve your tricks, and ride with our experienced coaches in a fun and friendly environment. Whether you're hitting your first rail or dialing in your spins, this camp is your next step in freestyle progression.",
-    "imageWeb": "future_web/",
-    "imageMobile": "future_mobile/"
+    "imageWeb": "future_web/Snowboard_Park_Camp.jpg",
+    "imageMobile": "future_mobile/Snowboard_Park_Camp.jpg"
   },
   {
     "id": "3",
@@ -41,7 +41,7 @@
     "date": "2026-03-14",
     "dateText": "14-15 March 2026",
     "description": "Be the first to ride Nitro’s brand-new 26-27 snowboard lineup — for free! Join us this March for an exclusive on-snow test event, open to all riders. Try out the latest shapes, tech, and designs before anyone else.",
-    "imageWeb": "future_web/",
-    "imageMobile": "future_mobile/"
+    "imageWeb": "future_web/Nitro_TestEvent.jpg",
+    "imageMobile": "future_mobile/Nitro_TestEvent.jpg"
   }
 ]

@@ -42,5 +42,7 @@
   "emailEmptyError": "Please enter your email",
   "emailInvalidError": "Please enter a valid email",
   "subjectEmptyError": "Please enter a subject",
-  "messageEmptyError": "Please enter your message"
+  "messageEmptyError": "Please enter your message",
+  "sendEmailFailed": "Send email failed: ",
+  "httpError": "HTTP request failed with status: "
 }

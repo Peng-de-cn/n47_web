@@ -40,38 +40,45 @@ class ContactPageState extends State<ContactPage> {
       _isLoading = true;
     });
 
-    try {
-      await EmailSender.submitForm(
+      final result = await EmailSender.submitForm(
           _nameController.text, _emailController.text, _subjectController.text, _messageController.text);
 
       if (!mounted) return;
-      ToastUtil.show(
+
+      if (result.success) {
+        // Success case
+        ToastUtil.show(
           context: context,
           message: AppLocalizations.of(context)!.sendSuccessDialog,
           type: ToastType.success,
           position: ToastPosition.center,
-          duration: ToastUtil.shortDuration);
+          duration: ToastUtil.shortDuration,
+        );
 
-      if (!mounted) return;
-      _formKey.currentState!.reset();
-      _nameController.clear();
-      _emailController.clear();
-      _subjectController.clear();
-      _messageController.clear();
-    } catch (e) {
-      if (!mounted) return;
-      ToastUtil.show(
+        _formKey.currentState!.reset();
+        _nameController.clear();
+        _emailController.clear();
+        _subjectController.clear();
+        _messageController.clear();
+      } else {
+        // Error case
+        var errorMessage = '${AppLocalizations.of(context)!.sendEmailFailed}: ${result.message}';
+        if (result.httpStatusCode != 200) {
+          errorMessage = '${AppLocalizations.of(context)!.httpError}: ${result.httpStatusCode}';
+        }
+        ToastUtil.show(
           context: context,
-          message: '${AppLocalizations.of(context)!.sendFailedDialog}: $e',
+          message: errorMessage,
           type: ToastType.error,
           position: ToastPosition.center,
-          duration: ToastUtil.longDuration);
-    } finally {
+          duration: ToastUtil.longDuration,
+        );
+      }
+
       if (mounted) {
         setState(() => _isLoading = false);
       }
     }
-  }
 
   @override
   Widget build(BuildContext context) {

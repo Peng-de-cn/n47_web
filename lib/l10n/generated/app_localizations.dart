@@ -314,6 +314,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter your message'**
   String get messageEmptyError;
+
+  /// No description provided for @sendEmailFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Send email failed: '**
+  String get sendEmailFailed;
+
+  /// No description provided for @httpError.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTP request failed with status: '**
+  String get httpError;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

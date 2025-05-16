@@ -118,4 +118,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get messageEmptyError => 'Please enter your message';
+
+  @override
+  String get sendEmailFailed => 'Send email failed: ';
+
+  @override
+  String get httpError => 'HTTP request failed with status: ';
 }

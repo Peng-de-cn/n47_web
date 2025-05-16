@@ -3,10 +3,8 @@ import { defineSecret } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
 import { getAppCheck } from 'firebase-admin/app-check';
 import express from 'express';
-import sgMail from '@sendgrid/mail';
+import { Resend } from 'resend';
 import cors from 'cors';
-
-const FUNCTION_MEMORY = '512MiB';
 
 // 配置常量
 const CONFIG = {
@@ -14,7 +12,7 @@ const CONFIG = {
   RETRY_DELAY_MS: 2000,
   FUNCTION_TIMEOUT_SEC: 60,
   FUNCTION_MEMORY: '512MiB' as const,
-  ALLOWED_ORIGINS: ['https://n47.web.app'],
+  ALLOWED_ORIGINS: ['https://n47.web.app', 'https://n47.eu'],
   RATE_LIMIT: {
     WINDOW_MS: 15 * 60 * 1000, // 15分钟
     MAX_REQUESTS: 100, // 每个IP每15分钟最多100次请求
@@ -22,8 +20,8 @@ const CONFIG = {
 };
 
 // 定义密钥参数
-const sendgridKey = defineSecret('SENDGRID_API_KEY');
-const fromEmail = defineSecret('SENDGRID_FROM_EMAIL');
+const resendKey = defineSecret('RESEND_API_KEY');
+const fromEmail = defineSecret('RESEND_FROM_EMAIL');
 
 // 初始化
 admin.initializeApp();
@@ -93,7 +91,7 @@ const verifyAppCheck = async (req: express.Request, res: express.Response, next:
   }
 };
 
-app.use(verifyAppCheck);
+ app.use(verifyAppCheck);
 
 // 健康检查端点
 app.get('/healthz', (req, res) => {
@@ -135,14 +133,20 @@ const validateEmailRequest = (req: express.Request, res: express.Response, next:
 };
 
 /**
- * 带指数退避的邮件发送重试机制
- * @param {import('@sendgrid/mail').MailDataRequired} msg - 要发送的邮件内容对象
+ * 带指数退避的邮件发送重试机制 - 修改为使用 Resend
+ * @param {object} msg - 要发送的邮件内容对象
  * @param {number} [retriesLeft=MAX_RETRIES] - 剩余重试次数，默认为MAX_RETRIES
  * @param {number} [baseDelay=RETRY_DELAY_MS] - 基础延迟时间(毫秒)，默认为RETRY_DELAY_MS
  * @returns {Promise<{success: boolean, attempts: number, error?: string}>} 返回发送结果
  */
 const sendEmailWithRetry = async (
-  msg: sgMail.MailDataRequired,
+  msg: {
+    from: string;
+    to: string;
+    subject: string;
+    html: string;
+    text?: string;
+  },
   retriesLeft = CONFIG.MAX_RETRIES,
   baseDelay = CONFIG.RETRY_DELAY_MS
 ): Promise<{ success: boolean; attempts: number; error?: string }> => {
@@ -150,10 +154,12 @@ const sendEmailWithRetry = async (
   
   for (let attempt = 1; attempt <= retriesLeft; attempt++) {
     try {
-      const [response] = await sgMail.send(msg);
+      const resend = new Resend(resendKey.value());
+      const response = await resend.emails.send(msg);
+      
       console.log(`邮件发送成功 (尝试次数: ${attempt})`, {
-        status: response.statusCode,
-        headers: response.headers
+        id: response.data?.id,
+        to: msg.to
       });
       return { success: true, attempts: attempt };
     } catch (error: unknown) {
@@ -163,9 +169,8 @@ const sendEmailWithRetry = async (
       let errorDetails = 'Unknown error';
       if (error instanceof Error) {
         errorDetails = error.message;
-        if ('response' in error && typeof error.response === 'object' && error.response !== null) {
-          const response = error.response as { body?: { errors?: unknown } };
-          errorDetails += ` | ${JSON.stringify(response.body?.errors)}`;
+        if (typeof error === 'object' && error !== null) {
+          errorDetails += ` | ${JSON.stringify(error)}`;
         }
       }
 
@@ -186,8 +191,8 @@ const sendEmailWithRetry = async (
   throw new Error('Failed to send email after retries');
 };
 
-// 邮件发送端点
-app.post('/', async (req, res) => {
+// 邮件发送端点 - 修改邮件构造部分
+app.post('/', validateEmailRequest, async (req, res) => {
   try {
     // 请求日志记录
     const requestId = Math.random().toString(36).substring(2, 9);
@@ -197,38 +202,19 @@ app.post('/', async (req, res) => {
       ip: req.ip
     });
 
-    // 1. 验证请求数据
-    const { name, email, subject, message } = req.body;
-    if (!name || !email|| !subject|| !message) {
-      console.warn(`[${requestId}] 参数验证失败`);
-      return res.status(400).json({
-        success: false,
-        error: '缺少必填参数',
-        required: ['name', 'email', 'subject', 'message']
-      });
-    }
+    // 1. 验证请求数据 (由中间件处理)
+    const { cleanName: name, cleanEmail: email, cleanSubject: subject, cleanMessage: message } = req.body;
 
-    // 2. 获取并验证配置
-    const sgApiKey = sendgridKey.value();
+    // 2. 获取配置 (Resend 不需要初始化步骤)
     const senderEmail = fromEmail.value();
     console.log('senderEmail:', senderEmail);
 
-    if (!sgApiKey?.startsWith('SG.')) {
-      throw new Error('无效的API密钥格式 (必须以SG.开头)');
-    }
-
-    // 3. 初始化SendGrid客户端
-    sgMail.setApiKey(sgApiKey);
-
-    // 4. 构造邮件
-    const msg: sgMail.MailDataRequired = {
-      to: "info@n47.eu",
-      from: {
-        email: senderEmail,
-        name: "N47 web" // 发件人名称
-      },
+    // 3. 构造邮件 (Resend 格式)
+    const msg = {
+      from: `N47 web <${senderEmail}>`, // Resend 的 from 格式可以是 "Name <email@example.com>"
+      to: "web@n47.eu",
       subject: "New email from web",
-      text: `From: ${email}`,
+      text: `From: ${email}\nName: ${name}\n\n${message}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px;">
           <h2 style="color: #333;">${subject}</h2>
@@ -244,7 +230,7 @@ app.post('/', async (req, res) => {
       `
     };
 
-    // 5. 发送邮件（带重试机制）
+    // 4. 发送邮件（带重试机制）
     const { success, attempts } = await sendEmailWithRetry(msg);
     
     return res.status(200).json({
@@ -258,9 +244,8 @@ app.post('/', async (req, res) => {
     let errorDetails = 'Unknown error';
     if (error instanceof Error) {
       errorDetails = error.message;
-      if ('response' in error && typeof error.response === 'object' && error.response !== null) {
-        const response = error.response as { body?: { errors?: unknown } };
-        errorDetails += ` | ${JSON.stringify(response.body?.errors)}`;
+      if (typeof error === 'object' && error !== null) {
+        errorDetails += ` | ${JSON.stringify(error)}`;
       }
     }
 
@@ -289,5 +274,5 @@ export const sendemail = onRequest({
   region: 'us-central1',
   timeoutSeconds: CONFIG.FUNCTION_TIMEOUT_SEC,
   memory: CONFIG.FUNCTION_MEMORY,
-  secrets: [sendgridKey, fromEmail]
+  secrets: [resendKey, fromEmail]
 }, app);
