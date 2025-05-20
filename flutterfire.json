@@ -1,0 +1,29 @@
+{
+  "platforms": {
+    "android": {
+      "default": {
+        "projectId": "n47web",
+        "appId": "1:187191289365:android:865269b3fdaa18c779d01c",
+        "fileOutput": "android/app/google-services.json"
+      }
+    },
+    "ios": {
+      "default": {
+        "projectId": "n47web",
+        "appId": "1:187191289365:ios:65d82b15f266a10879d01c",
+        "uploadDebugSymbols": false,
+        "fileOutput": "ios/Runner/GoogleService-Info.plist"
+      }
+    },
+    "dart": {
+      "lib/firebase_options.dart": {
+        "projectId": "n47web",
+        "configurations": {
+          "android": "1:187191289365:android:865269b3fdaa18c779d01c",
+          "ios": "1:187191289365:ios:65d82b15f266a10879d01c",
+          "web": "1:187191289365:web:8ee318c2535140d179d01c"
+        }
+      }
+    }
+  }
+}
