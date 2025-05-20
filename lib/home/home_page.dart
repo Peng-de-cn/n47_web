@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:n47_web/firebase/fire_store.dart';
 import 'package:n47_web/header/app_header.dart';
 import 'package:n47_web/home/home_bloc.dart';
+import 'package:n47_web/home/scrolldown_indicator.dart';
 import '../bloc/future_events_cubit.dart';
 import '../database/event.dart';
 import '../footer/app_footer.dart';
@@ -37,7 +38,7 @@ class HomePage extends StatelessWidget {
               ),
               const AppHeader(),
               Positioned(
-                top: 100,
+                top: Util.isMobile(context) ? 60 : 100,
                 left: 0,
                 right: 0,
                 bottom: 0,
@@ -51,34 +52,48 @@ class HomePage extends StatelessWidget {
   }
 
   Widget buildContent(List<Event> events, BuildContext context) {
+    final isMobile = Util.isMobile(context);
+    final scrollController = ScrollController();
+    final mediaQuery = MediaQuery.of(context);
+
     return CustomScrollView(
+      controller: scrollController,
       slivers: [
         SliverToBoxAdapter(
           child: Container(
             padding: EdgeInsets.only(
-              top: Util.isMobile(context) ? 150 : 200,
-              bottom: Util.isMobile(context) ? 200 : 500,
+              top: isMobile
+                  ? mediaQuery.size.height * 0.2  // 20% of screen height for top padding
+                  : mediaQuery.size.height * 0.3, // 30%
+              bottom: isMobile
+                  ? mediaQuery.size.height * 0.1  // 10% of screen height for bottom padding
+                  : mediaQuery.size.height * 0.2, // 20%
             ),
             child: Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: Util.isMobile(context) ? 20.0 : 40.0,
+                horizontal: isMobile ? 20.0 : 40.0,
               ),
-              child: Center(
-                child: Text(
-                  AppLocalizations.of(context)!.appTitle,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.rajdhani(
-                      fontSize: Util.isMobile(context) ? 36 : 64,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      letterSpacing: Util.isMobile(context) ? 0.8 : 1.5,
-                      shadows: [
-                        Shadow(
-                            color: Color.fromRGBO(0, 0, 0, 0.3),
-                            blurRadius: 4,
-                            offset: Offset(Util.isMobile(context) ? 1 : 2, Util.isMobile(context) ? 1 : 2))
-                      ]),
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.appTitle,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.rajdhani(
+                        fontSize: isMobile ? 40 : 64,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: isMobile ? 0.8 : 1.5,
+                        shadows: [
+                          Shadow(
+                              color: Color.fromRGBO(0, 0, 0, 0.3),
+                              blurRadius: 4,
+                              offset: Offset(isMobile ? 1 : 2, isMobile ? 1 : 2))
+                        ]),
+                  ),
+                  SizedBox(height: mediaQuery.size.height * 0.3), // 30% of screen height
+                  ScrollDownIndicator(scrollController: scrollController),
+                ],
               ),
             ),
           ),
