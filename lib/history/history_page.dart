@@ -160,7 +160,7 @@ class HistoryPageState extends State<HistoryPage> {
           ),
           const AppHeader(),
           Positioned(
-            top: Util.isMobile(context) ? 60 : 100,
+            top: Util.isMobile(context) ? 60 : 80,
             left: 0,
             right: 0,
             bottom: 0,
@@ -179,29 +179,26 @@ class HistoryPageState extends State<HistoryPage> {
   }
 
   Widget _buildSeasonSelector() {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: Util.isMobile(context) ? 6.0 : 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-            icon: Icon(Icons.chevron_left, size: Util.isMobile(context) ? 28 : 32),
-            onPressed: _currentSeasonIndex > 0 ? _goToPreviousSeason : null,
-            padding: Util.isMobile(context) ? EdgeInsets.all(8) : EdgeInsets.all(12),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          icon: Icon(Icons.chevron_left, size: Util.isMobile(context) ? 28 : 32),
+          onPressed: _currentSeasonIndex > 0 ? _goToPreviousSeason : null,
+          padding: Util.isMobile(context) ? EdgeInsets.all(8) : EdgeInsets.all(12),
+        ),
+        Text(
+          '${_availableSeasons[_currentSeasonIndex]} ${AppLocalizations.of(context)!.historyTab}',
+          style: TextStyle(
+            fontSize: Util.isMobile(context) ? 18 : 24,
+            fontWeight: FontWeight.bold,
           ),
-          Text(
-            '${_availableSeasons[_currentSeasonIndex]} ${AppLocalizations.of(context)!.historyTab}',
-            style: TextStyle(
-              fontSize: Util.isMobile(context) ? 18 : 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.chevron_right, size: Util.isMobile(context) ? 28 : 32),
-            onPressed: _currentSeasonIndex < _availableSeasons.length - 1 ? _goToNextSeason : null,
-          ),
-        ],
-      ),
+        ),
+        IconButton(
+          icon: Icon(Icons.chevron_right, size: Util.isMobile(context) ? 28 : 32),
+          onPressed: _currentSeasonIndex < _availableSeasons.length - 1 ? _goToNextSeason : null,
+        ),
+      ],
     );
   }
 
@@ -241,7 +238,7 @@ class HistoryPageState extends State<HistoryPage> {
           if (index % 2 == 0) ...[
             Expanded(
               flex: 3,
-              child: buildDesktopTextContent(event, true),
+              child: buildDesktopTextContent(event),
             ),
             Expanded(
               flex: 2,
@@ -254,7 +251,7 @@ class HistoryPageState extends State<HistoryPage> {
             ),
             Expanded(
               flex: 3,
-              child: buildDesktopTextContent(event, false),
+              child: buildDesktopTextContent(event),
             ),
           ],
         ],
@@ -262,14 +259,14 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildDesktopTextContent(Event event, bool alignLeft) {
+  Widget buildDesktopTextContent(Event event) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Align(
-          alignment: alignLeft ? Alignment.centerLeft : Alignment.centerRight,
+          alignment: Alignment.centerLeft,
           child: Column(
-            crossAxisAlignment: alignLeft ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 Util.formatHtmlText(event.dateText),

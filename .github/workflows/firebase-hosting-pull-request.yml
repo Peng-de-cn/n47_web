@@ -16,7 +16,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: '3.16.0'  # 使用你项目实际的Flutter版本
+          flutter-version: '3.29.2'  # 使用你项目实际的Flutter版本
 
       # 缓存依赖
       - name: Cache Flutter dependencies

@@ -15,7 +15,7 @@ class AppHeader extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Positioned(
-      top: 10,
+      top: 0,
       left: 0,
       right: 0,
       child: Container(
@@ -44,27 +44,11 @@ class AppHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          InkWell(
-            onTap: () {
-              final currentRoute = ModalRoute.of(context)?.settings.name ?? '/';
-              if (currentRoute != '/') {
-                Navigator.pushReplacement(
-                  context,
-                  AppRouter.createFadeRoute(HomePage(), RouteSettings(name: '/')),
-                );
-              }
-            },
-            child: Image.asset(
-              'assets/icons/n47_logo.png',
-              width: 48,
-              height: 48,
-            ),
-          ),
+          _buildLogo(context, 48),
 
           Expanded(
             child: Container(
               margin: const EdgeInsets.only(left: 4),
-              height: 50,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
@@ -86,40 +70,74 @@ class AppHeader extends StatelessWidget {
   }
 
   Widget buildDesktopLayout(BuildContext context, BoxConstraints constraints) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        InkWell(
-          onTap: () {
-            final currentRoute = ModalRoute.of(context)?.settings.name ?? '/';
-            if (currentRoute != '/') {
-              Navigator.pushReplacement(
-                context,
-                AppRouter.createFadeRoute(HomePage(), RouteSettings(name: '/')),
-              );
-            } else {
-              logger.d('Already on home page, ignoring click');
-            }
-          },
-          child: Image.asset('assets/icons/n47_logo.png',
-            width: 60,
-            height: 60,
+    final bool isLargeScreen = constraints.maxWidth > 900;
+    if (isLargeScreen) {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          Center(
+            child: _buildLogo(context, 80),
           ),
-        ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _buildNavItem(context, AppLocalizations.of(context)!.naviHistory, '/history'),
-            const SizedBox(width: 20),
-            _buildNavItem(context, AppLocalizations.of(context)!.naviSponsors, '/sponsors'),
-            const SizedBox(width: 20),
-            _buildNavItem(context, AppLocalizations.of(context)!.naviContact, '/contact'),
-            const SizedBox(width: 20),
-            _buildNavItem(context, AppLocalizations.of(context)!.naviAbout, '/about'),
-          ],
-        ),
-      ],
+          Positioned(
+            right: 0,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildNavItem(context, AppLocalizations.of(context)!.naviHistory, '/history'),
+                const SizedBox(width: 20),
+                _buildNavItem(context, AppLocalizations.of(context)!.naviSponsors, '/sponsors'),
+                const SizedBox(width: 20),
+                _buildNavItem(context, AppLocalizations.of(context)!.naviContact, '/contact'),
+                const SizedBox(width: 20),
+                _buildNavItem(context, AppLocalizations.of(context)!.naviAbout, '/about'),
+              ],
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _buildLogo(context, 80),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildNavItem(context, AppLocalizations.of(context)!.naviHistory, '/history'),
+              const SizedBox(width: 20),
+              _buildNavItem(context, AppLocalizations.of(context)!.naviSponsors, '/sponsors'),
+              const SizedBox(width: 20),
+              _buildNavItem(context, AppLocalizations.of(context)!.naviContact, '/contact'),
+              const SizedBox(width: 20),
+              _buildNavItem(context, AppLocalizations.of(context)!.naviAbout, '/about'),
+            ],
+          ),
+        ],
+      );
+    }
+
+  }
+
+  Widget _buildLogo(BuildContext context, double size) {
+    return InkWell(
+      onTap: () {
+        final currentRoute = ModalRoute.of(context)?.settings.name ?? '/';
+        if (currentRoute != '/') {
+          Navigator.pushReplacement(
+            context,
+            AppRouter.createFadeRoute(
+              const HomePage(),
+              const RouteSettings(name: '/'),
+            ),
+          );
+        }
+      },
+      child: Image.asset(
+        'assets/icons/n47_logo.png',
+        width: size,
+        height: size,
+      ),
     );
   }
 

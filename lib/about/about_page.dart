@@ -20,7 +20,7 @@ class AboutPage extends StatelessWidget {
           ),
           const AppHeader(),
           Positioned(
-            top: Util.isMobile(context) ? 60 : 100,
+            top: Util.isMobile(context) ? 60 : 80,
             left: 0,
             right: 0,
             bottom: 0,

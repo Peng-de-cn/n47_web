@@ -38,7 +38,7 @@ class HomePage extends StatelessWidget {
               ),
               const AppHeader(),
               Positioned(
-                top: Util.isMobile(context) ? 60 : 100,
+                top: Util.isMobile(context) ? 60 : 80,
                 left: 0,
                 right: 0,
                 bottom: 0,
@@ -147,7 +147,7 @@ class HomePage extends StatelessWidget {
           if (index % 2 == 0) ...[
             Expanded(
               flex: 3,
-              child: buildDesktopTextContent(event, true),
+              child: buildDesktopTextContent(event),
             ),
             Expanded(
               flex: 2,
@@ -160,7 +160,7 @@ class HomePage extends StatelessWidget {
             ),
             Expanded(
               flex: 3,
-              child: buildDesktopTextContent(event, false),
+              child: buildDesktopTextContent(event),
             ),
           ],
         ],
@@ -168,14 +168,14 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget buildDesktopTextContent(Event event, bool alignLeft) {
+  Widget buildDesktopTextContent(Event event) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Align(
-          alignment: alignLeft ? Alignment.centerLeft : Alignment.centerRight,
+          alignment: Alignment.centerLeft,
           child: Column(
-            crossAxisAlignment: alignLeft ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 Util.formatHtmlText(event.dateText),
