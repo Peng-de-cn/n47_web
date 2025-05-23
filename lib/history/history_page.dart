@@ -24,6 +24,10 @@ class HistoryPageState extends State<HistoryPage> {
   int _currentSeasonIndex = 0;
   List<String> _availableSeasons = [];
   late List<List<Event>> _seasonalEvents;
+  final List<Color> _alternateColors = [
+    const Color(0xFFF5F5F5),
+    const Color(0xFFEDEDED),
+  ];
 
   @override
   void initState() {
@@ -231,32 +235,43 @@ class HistoryPageState extends State<HistoryPage> {
   }
 
   Widget buildDesktopLayout(int index, Event event) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 20.0),
-      child: Row(
-        children: [
-          if (index % 2 == 0) ...[
-            Expanded(
-              flex: 3,
-              child: buildDesktopTextContent(event),
-            ),
-            Expanded(
-              flex: 2,
-              child: buildDesktopImageContent(event),
-            ),
-          ] else ...[
-            Expanded(
-              flex: 2,
-              child: buildDesktopImageContent(event),
-            ),
-            Expanded(
-              flex: 3,
-              child: buildDesktopTextContent(event),
-            ),
-          ],
-        ],
+    return Container(
+      color: _alternateColors[index % 2],
+      padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 30.0),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final textWidth = constraints.maxWidth * 0.7;
+          final imageWidth = constraints.maxWidth * 0.3;
+
+          return index % 2 == 0
+              ? Row(
+            children: [
+              SizedBox(
+                width: textWidth,
+                child: buildDesktopTextContent(event),
+              ),
+              SizedBox(
+                width: imageWidth,
+                child: buildDesktopImageContent(event),
+              ),
+            ],
+          )
+              : Row(
+            children: [
+              SizedBox(
+                width: imageWidth,
+                child: buildDesktopImageContent(event),
+              ),
+              SizedBox(
+                width: textWidth,
+                child: buildDesktopTextContent(event),
+              ),
+            ],
+          );
+        },
       ),
     );
+
   }
 
   Widget buildDesktopTextContent(Event event) {

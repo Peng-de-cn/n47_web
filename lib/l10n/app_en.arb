@@ -44,5 +44,10 @@
   "subjectEmptyError": "Please enter a subject",
   "messageEmptyError": "Please enter your message",
   "sendEmailFailed": "Send email failed: ",
-  "httpError": "HTTP request failed with status: "
+  "httpError": "HTTP request failed with status: ",
+
+  "cookieTitle": "We use cookies \uD83C\uDF6A",
+  "cookieDescription": "We use cookies and similar technologies to provide core site functionality and to understand usage patterns to improve your experience. You can choose to accept all or only necessary cookies.",
+  "acceptAll": "Accept all",
+  "reject": "Only necessary"
 }

@@ -65,8 +65,8 @@ class _ScrollDownIndicatorState extends State<ScrollDownIndicator> with SingleTi
           );
         },
         child: const Icon(
-          Icons.keyboard_arrow_down,
-          size: 40,
+          Icons.keyboard_arrow_down_rounded,
+          size: 95,
           color: Colors.white,
         ),
       ),

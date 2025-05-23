@@ -326,6 +326,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'HTTP request failed with status: '**
   String get httpError;
+
+  /// No description provided for @cookieTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We use cookies 🍪'**
+  String get cookieTitle;
+
+  /// No description provided for @cookieDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'We use cookies and similar technologies to provide core site functionality and to understand usage patterns to improve your experience. You can choose to accept all or only necessary cookies.'**
+  String get cookieDescription;
+
+  /// No description provided for @acceptAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept all'**
+  String get acceptAll;
+
+  /// No description provided for @reject.
+  ///
+  /// In en, this message translates to:
+  /// **'Only necessary'**
+  String get reject;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

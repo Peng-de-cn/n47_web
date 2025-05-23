@@ -1,4 +1,5 @@
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,9 +14,9 @@ import 'package:n47_web/utils/logger_util.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'bloc/future_events_cubit.dart';
 import 'bloc/history_events_cubit.dart';
+import 'cookie/cookie_consent_overlay.dart';
 import 'firebase/fire_store.dart';
 import 'firebase_options.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,27 +68,34 @@ class N47App extends StatelessWidget {
 
   Widget buildAppContent() {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => HomeBloc()),
-        BlocProvider(create: (_) => FutureEventsCubit()),
-        BlocProvider(create: (_) => HistoryEventsCubit()),
-      ],
-      child: MaterialApp(
-          title: 'N47',
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate
-          ],
-          supportedLocales: const [Locale('en')],
-          theme: ThemeData(
-            scaffoldBackgroundColor: Colors.white,
-          ),
-          onGenerateRoute: AppRouter.generateRoute,
-          home: BlocProvider(create: (context) => HomeBloc(), child: HomePage())
-      )
+        providers: [
+          BlocProvider(create: (_) => HomeBloc()),
+          BlocProvider(create: (_) => FutureEventsCubit()),
+          BlocProvider(create: (_) => HistoryEventsCubit()),
+        ],
+        child: MaterialApp(
+            title: 'N47',
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate
+            ],
+            supportedLocales: const [Locale('en')],
+            theme: ThemeData(
+              scaffoldBackgroundColor: Colors.white,
+            ),
+            onGenerateRoute: AppRouter.generateRoute,
+            home: BlocProvider(
+                create: (context) => HomeBloc(),
+                child: Stack(
+                  children: const [
+                    HomePage(),
+                    CookieConsentOverlay(),
+                  ],
+                ),
+            ),
+        ),
     );
   }
-
 }

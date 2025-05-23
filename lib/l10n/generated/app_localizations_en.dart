@@ -124,4 +124,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get httpError => 'HTTP request failed with status: ';
+
+  @override
+  String get cookieTitle => 'We use cookies 🍪';
+
+  @override
+  String get cookieDescription => 'We use cookies and similar technologies to provide core site functionality and to understand usage patterns to improve your experience. You can choose to accept all or only necessary cookies.';
+
+  @override
+  String get acceptAll => 'Accept all';
+
+  @override
+  String get reject => 'Only necessary';
 }

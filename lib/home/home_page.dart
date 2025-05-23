@@ -65,9 +65,7 @@ class HomePage extends StatelessWidget {
               top: isMobile
                   ? mediaQuery.size.height * 0.2  // 20% of screen height for top padding
                   : mediaQuery.size.height * 0.3, // 30%
-              bottom: isMobile
-                  ? mediaQuery.size.height * 0.1  // 10% of screen height for bottom padding
-                  : mediaQuery.size.height * 0.2, // 20%
+              bottom: mediaQuery.size.height * 0.2  // 20% of screen height for bottom padding
             ),
             child: Padding(
               padding: EdgeInsets.symmetric(
@@ -108,13 +106,13 @@ class HomePage extends StatelessWidget {
                     begin: Alignment(0.0, -1.0),
                     end: Alignment(0.0, 0.5),
                     colors: [
-                      Colors.transparent,
-                      Colors.white.withOpacity(0.1),
-                      Colors.white.withOpacity(0.3),
+                      Colors.white.withOpacity(0.6),
                       Colors.white.withOpacity(0.7),
+                      Colors.white.withOpacity(0.8),
+                      Colors.white.withOpacity(0.9),
                       Colors.white,
                     ],
-                    stops: [0.0, 0.1, 0.3, 0.7, 1.0],
+                    stops: [0.6, 0.7, 0.8, 0.9, 1.0],
                     tileMode: TileMode.clamp,
                   ),
                 ),
@@ -142,28 +140,37 @@ class HomePage extends StatelessWidget {
   Widget buildDesktopLayout(int index, Event event) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 20.0),
-      child: Row(
-        children: [
-          if (index % 2 == 0) ...[
-            Expanded(
-              flex: 3,
-              child: buildDesktopTextContent(event),
-            ),
-            Expanded(
-              flex: 2,
-              child: buildDesktopImageContent(event),
-            ),
-          ] else ...[
-            Expanded(
-              flex: 2,
-              child: buildDesktopImageContent(event),
-            ),
-            Expanded(
-              flex: 3,
-              child: buildDesktopTextContent(event),
-            ),
-          ],
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final textWidth = constraints.maxWidth * 0.7;
+          final imageWidth = constraints.maxWidth * 0.3;
+
+          return index % 2 == 0
+              ? Row(
+            children: [
+              SizedBox(
+                width: textWidth,
+                child: buildDesktopTextContent(event),
+              ),
+              SizedBox(
+                width: imageWidth,
+                child: buildDesktopImageContent(event),
+              ),
+            ],
+          )
+              : Row(
+            children: [
+              SizedBox(
+                width: imageWidth,
+                child: buildDesktopImageContent(event),
+              ),
+              SizedBox(
+                width: textWidth,
+                child: buildDesktopTextContent(event),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -211,7 +218,7 @@ class HomePage extends StatelessWidget {
   Widget buildDesktopImageContent(Event event) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.20),
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {},
