@@ -245,134 +245,129 @@ class HistoryPageState extends State<HistoryPage> {
 
           return index % 2 == 0
               ? Row(
-            children: [
-              SizedBox(
-                width: textWidth,
-                child: buildDesktopTextContent(event),
-              ),
-              SizedBox(
-                width: imageWidth,
-                child: buildDesktopImageContent(event),
-              ),
-            ],
-          )
+                  children: [
+                    SizedBox(
+                      width: textWidth,
+                      child: buildDesktopTextContent(event),
+                    ),
+                    SizedBox(
+                      width: imageWidth,
+                      child: buildDesktopImageContent(event),
+                    ),
+                  ],
+                )
               : Row(
-            children: [
-              SizedBox(
-                width: imageWidth,
-                child: buildDesktopImageContent(event),
-              ),
-              SizedBox(
-                width: textWidth,
-                child: buildDesktopTextContent(event),
-              ),
-            ],
-          );
+                  children: [
+                    SizedBox(
+                      width: imageWidth,
+                      child: buildDesktopImageContent(event),
+                    ),
+                    SizedBox(
+                      width: textWidth,
+                      child: buildDesktopTextContent(event),
+                    ),
+                  ],
+                );
         },
       ),
     );
-
   }
 
   Widget buildDesktopTextContent(Event event) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                Util.formatHtmlText(event.dateText),
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[700],
-                ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              Util.formatHtmlText(event.dateText),
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[700],
               ),
-              const SizedBox(height: 8),
-              Text(
-                Util.formatHtmlText(event.title),
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              Util.formatHtmlText(event.title),
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 16),
-              Text(
-                Util.formatHtmlText(event.description),
-                style: const TextStyle(
-                  fontSize: 18,
-                  height: 1.5,
-                ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              Util.formatHtmlText(event.description),
+              style: const TextStyle(
+                fontSize: 18,
+                height: 1.5,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget buildDesktopImageContent(Event event) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {},
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 15,
-                  offset: const Offset(0, 10),
-                ),
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: AspectRatio(
-                aspectRatio: 3 / 4,
-                child: FutureBuilder<String?>(
-                  future: Firestore.loadImageUrl(event.imageWeb),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return AnimatedOpacity(
-                        opacity: 0.5,
-                        duration: const Duration(milliseconds: 300),
-                        child: buildLoadingWidget(),
-                      );
-                    }
-
-                    if (snapshot.hasError) {
-                      logger.e('Image load failed: ${snapshot.error}');
-                      return buildErrorWidget();
-                    }
-
-                    final url = snapshot.data;
-                    if (url == null || url.isEmpty) {
-                      return buildErrorWidget();
-                    }
-
-                    return CachedNetworkImage(
-                      imageUrl: url,
-                      fit: BoxFit.cover,
-                      placeholder: (_, __) => buildLoadingWidget(),
-                      errorWidget: (_, url, error) => buildErrorWidget(),
-                      maxWidthDiskCache: kIsWeb ? null : 1024,
-                      fadeInDuration: const Duration(milliseconds: 200),
-                      imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {},
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 15,
+                offset: const Offset(0, 10),
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: AspectRatio(
+              aspectRatio: 3 / 4,
+              child: FutureBuilder<String?>(
+                future: Firestore.loadImageUrl(event.imageWeb),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return AnimatedOpacity(
+                      opacity: 0.5,
+                      duration: const Duration(milliseconds: 300),
+                      child: buildLoadingWidget(),
                     );
-                  },
-                ),
+                  }
+
+                  if (snapshot.hasError) {
+                    logger.e('Image load failed: ${snapshot.error}');
+                    return buildErrorWidget();
+                  }
+
+                  final url = snapshot.data;
+                  if (url == null || url.isEmpty) {
+                    return buildErrorWidget();
+                  }
+
+                  return CachedNetworkImage(
+                    imageUrl: url,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => buildLoadingWidget(),
+                    errorWidget: (_, url, error) => buildErrorWidget(),
+                    maxWidthDiskCache: kIsWeb ? null : 1024,
+                    fadeInDuration: const Duration(milliseconds: 200),
+                    imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
+                  );
+                },
               ),
             ),
           ),
