@@ -1,8 +1,11 @@
 
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../utils/logger_util.dart';
-
+import 'dart:html' as html;
 
 class SponsorItem extends StatelessWidget {
   final String imagePath;
@@ -19,12 +22,17 @@ class SponsorItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = maxSize * 0.6;
+    final hasUrl = url.trim().isNotEmpty;
 
     return Center(
       child: MouseRegion(
-        cursor: SystemMouseCursors.click,
+        cursor: hasUrl ? SystemMouseCursors.click : SystemMouseCursors.basic,
         child: GestureDetector(
-          onTap: _launchSponsorUrl,
+          onTap: hasUrl
+              ? () {
+                  _launchSponsorUrl();
+                }
+              : null,
           child: Container(
             width: size,
             height: size,
@@ -53,14 +61,32 @@ class SponsorItem extends StatelessWidget {
 
   Future<void> _launchSponsorUrl() async {
     try {
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(
-          Uri.parse(url),
-          mode: LaunchMode.externalApplication,
-        );
+      if (kIsWeb) {
+        // Web 环境
+        final userAgent = html.window.navigator.userAgent.toLowerCase();
+        final isIosSafari = userAgent.contains('iphone') ||
+            userAgent.contains('ipad') ||
+            (userAgent.contains('safari') && !userAgent.contains('chrome'));
+
+        if (isIosSafari) {
+          html.window.location.href = url;
+        } else {
+          await _launchWithUrlLauncher();
+        }
+      } else {
+        await _launchWithUrlLauncher();
       }
     } catch (e) {
       logger.e('Could not launch $url: $e');
+    }
+  }
+
+  Future<void> _launchWithUrlLauncher() async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(
+        Uri.parse(url),
+        mode: LaunchMode.externalApplication,
+      );
     }
   }
 }

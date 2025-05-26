@@ -12,6 +12,7 @@ import 'package:n47_web/navigation/AppRouter.dart';
 import 'package:n47_web/splash/splash_page.dart';
 import 'package:n47_web/utils/logger_util.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:tuple/tuple.dart';
 import 'bloc/future_events_cubit.dart';
 import 'bloc/history_events_cubit.dart';
 import 'cookie/cookie_consent_overlay.dart';
@@ -44,15 +45,10 @@ class N47App extends StatelessWidget {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await activateAppCheck();
-
-    await EventRepository.init();
-
-    List<Map<String, dynamic>> futureEvents = await Firestore.fetchFutureEvents();
-    await EventRepository.importFutureEvents(futureEvents);
-
-    List<Map<String, dynamic>> historyEvents = await Firestore.fetchHistoryEvents();
-    await EventRepository.importHistoryEvents(historyEvents);
+    await Future.wait([
+      activateAppCheck(),
+      loadEvents(),
+    ]);
   }
 
   Future<void> activateAppCheck() async {
@@ -64,6 +60,17 @@ class N47App extends StatelessWidget {
 
     // final token = await FirebaseAppCheck.instance.getToken();
     // logger.d('App Check Token: $token');
+  }
+
+  Future<void> loadEvents() async {
+    final Tuple2<List<Map<String, dynamic>>, List<Map<String, dynamic>>> results =
+    await Future.wait([
+      Firestore.fetchFutureEvents(),
+      Firestore.fetchHistoryEvents(),
+    ]).then((list) => Tuple2(list[0], list[1]));
+
+    await EventRepository.importFutureEvents(results.item1);
+    await EventRepository.importHistoryEvents(results.item2);
   }
 
   Widget buildAppContent() {

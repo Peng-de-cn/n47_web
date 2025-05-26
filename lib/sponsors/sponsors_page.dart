@@ -11,12 +11,12 @@ class SponsorsPage extends StatelessWidget {
 
   final List<Map<String, String>> sponsors = [
     {'image': 'assets/sponsors/nitro.jpg', 'url': 'https://nitrosnowboards.com'},
-    {'image': 'assets/sponsors/jones.png', 'url': 'https://www.jonessnowboards.com'},
+    {'image': 'assets/sponsors/jones.jpg', 'url': 'https://www.jonessnowboards.com'},
     {'image': 'assets/sponsors/nidecker.jpg', 'url': 'https://www.nidecker.com'},
     {'image': 'assets/sponsors/yes.jpg', 'url': 'https://yessnowboards.com'},
-    {'image': 'assets/sponsors/goski.png', 'url': ''},
+    {'image': 'assets/sponsors/goski.jpg', 'url': ''},
     {'image': 'assets/sponsors/stadele.jpg', 'url': 'https://www.stadele.eu'},
-    {'image': 'assets/sponsors/snowland.png', 'url': ''},
+    {'image': 'assets/sponsors/snowland.jpg', 'url': ''},
   ];
 
   @override
