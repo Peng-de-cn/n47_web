@@ -10,6 +10,7 @@ import 'package:n47_web/header/app_header.dart';
 import 'package:n47_web/home/home_bloc.dart';
 import 'package:n47_web/home/scrolldown_indicator.dart';
 import '../bloc/future_events_cubit.dart';
+import '../bloc/history_events_cubit.dart';
 import '../database/event.dart';
 import '../footer/app_footer.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -17,41 +18,66 @@ import '../refreshable/refreshable_page.dart';
 import '../utils/util.dart';
 import '../utils/logger_util.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool _initialized = false;
+  bool _backgroundLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final backgroundImage = context.read<HomeBloc>().state.backgroundImage;
+
+      await precacheImage(AssetImage(backgroundImage), context);
+      setState(() => _backgroundLoaded = true);
+
+      final historyCubit = context.read<HistoryEventsCubit>();
+      await historyCubit.initializeFirebaseData();
+      historyCubit.loadEvents();
+
+      setState(() => _initialized = true);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final events = context.read<FutureEventsCubit>().state;
+    final homeState = context.watch<HomeBloc>().state;
+    final futureEvents = context.watch<FutureEventsCubit>().state;
+
     return RefreshablePage(
-      child: BlocBuilder<HomeBloc, HomeState>(
-        builder: (context, state) {
-          return Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(state.backgroundImage),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              const AppHeader(),
-              Positioned(
-                top: Util.isMobile(context) ? 60 : 80,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: buildContent(events, context),
-              ),
-            ],
-          );
-        },
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              homeState.backgroundImage,
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          if (_backgroundLoaded) ...[
+            const AppHeader(),
+            Positioned(
+              top: Util.isMobile(context) ? 60 : 80,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: buildContent(context, futureEvents),
+            ),
+          ]
+        ],
       ),
     );
   }
 
-  Widget buildContent(List<Event> events, BuildContext context) {
+  Widget buildContent(BuildContext context, List<Event> events) {
     final isMobile = Util.isMobile(context);
     final scrollController = ScrollController();
     final mediaQuery = MediaQuery.of(context);
@@ -62,77 +88,81 @@ class HomePage extends StatelessWidget {
         SliverToBoxAdapter(
           child: Container(
             padding: EdgeInsets.only(
-                top: isMobile
-                    ? mediaQuery.size.height * 0.2 // 20% of screen height for top padding
-                    : mediaQuery.size.height * 0.3, // 30%
-                bottom: mediaQuery.size.height * 0.2 // 20% of screen height for bottom padding
-                ),
+              top: isMobile ? mediaQuery.size.height * 0.2 : mediaQuery.size.height * 0.3,
+              bottom: mediaQuery.size.height * 0.2,
+            ),
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: isMobile ? 20.0 : 40.0,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 20.0 : 40.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     AppLocalizations.of(context)!.appTitle,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.rajdhani(
-                        fontSize: isMobile ? 40 : 64,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        letterSpacing: isMobile ? 0.8 : 1.5,
-                        shadows: [
-                          Shadow(
-                              color: Color.fromRGBO(0, 0, 0, 0.3),
-                              blurRadius: 4,
-                              offset: Offset(isMobile ? 1 : 2, isMobile ? 1 : 2))
-                        ]),
+                    style: TextStyle(
+                      fontFamily: 'Rajdhani',
+                      fontSize: isMobile ? 40 : 64,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: isMobile ? 0.8 : 1.5,
+                      shadows: [
+                        Shadow(
+                          color: const Color.fromRGBO(0, 0, 0, 0.3),
+                          blurRadius: 4,
+                          offset: Offset(isMobile ? 1 : 2, isMobile ? 1 : 2),
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: mediaQuery.size.height * 0.3), // 30% of screen height
+                  SizedBox(height: mediaQuery.size.height * 0.3),
                   ScrollDownIndicator(scrollController: scrollController),
                 ],
               ),
             ),
           ),
         ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final event = events[index];
-              return Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment(0.0, -1.0),
-                    end: Alignment(0.0, 0.5),
-                    colors: [
-                      Colors.white.withOpacity(0.6),
-                      Colors.white.withOpacity(0.7),
-                      Colors.white.withOpacity(0.8),
-                      Colors.white.withOpacity(0.9),
-                      Colors.white,
-                    ],
-                    stops: [0.6, 0.7, 0.8, 0.9, 1.0],
-                    tileMode: TileMode.clamp,
+        if (!_initialized || events.isEmpty)
+          const SliverToBoxAdapter(
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 80),
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          )
+        else
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final event = events[index];
+                return Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment(0.0, -1.0),
+                      end: Alignment(0.0, 0.5),
+                      colors: [
+                        Colors.white.withOpacity(0.6),
+                        Colors.white.withOpacity(0.7),
+                        Colors.white.withOpacity(0.8),
+                        Colors.white.withOpacity(0.9),
+                        Colors.white,
+                      ],
+                      stops: [0.6, 0.7, 0.8, 0.9, 1.0],
+                    ),
                   ),
-                ),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    if (constraints.maxWidth > 600) {
-                      return buildDesktopLayout(index, event);
-                    } else {
-                      return buildMobileLayout(index, event, events.length);
-                    }
-                  },
-                ),
-              );
-            },
-            childCount: events.length,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return constraints.maxWidth > 600
+                          ? buildDesktopLayout(index, event)
+                          : buildMobileLayout(index, event, events.length);
+                    },
+                  ),
+                );
+              },
+              childCount: events.length,
+            ),
           ),
-        ),
-        const SliverToBoxAdapter(
-          child: AppFooter(), // Footer as part of the scrolling content
-        ),
+        const SliverToBoxAdapter(child: AppFooter()),
       ],
     );
   }

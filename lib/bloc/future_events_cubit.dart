@@ -1,12 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../database/event.dart';
 import '../database/event_repository.dart';
+import '../firebase/fire_store.dart';
 import '../utils/logger_util.dart';
 
 class FutureEventsCubit extends Cubit<List<Event>> {
 
-  FutureEventsCubit() : super([]) {
-    loadEvents();
+  FutureEventsCubit() : super([]);
+
+  Future<void> initializeFirebaseData() async {
+    final events = await Firestore.fetchFutureEvents();
+    await EventRepository.importFutureEvents(events);
   }
 
   Future<void> loadEvents() async {

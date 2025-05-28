@@ -1,104 +1,157 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
-
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="N47 ExtremeSport League">
 
   <link rel="icon" type="image/png" href="favicon.png">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="n47_web">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="N47 Web">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <title>N47</title>
   <link rel="manifest" href="manifest.json">
-</head>
-<body>
-  <!-- This script installs service_worker.js to provide PWA functionality to
-       application. For more information, see:
-       https://developers.google.com/web/fundamentals/primers/service-workers -->
-  <script>
-    const serviceWorkerVersion = '{{flutter_service_worker_version}}';
-    var scriptLoaded = false;
-    function loadMainDartJs() {
-      if (scriptLoaded) {
-        return;
-      }
-      scriptLoaded = true;
-      var scriptTag = document.createElement('script');
-      scriptTag.src = 'main.dart.js';
-      scriptTag.type = 'application/javascript';
-      document.body.append(scriptTag);
-    }
 
-    if ('serviceWorker' in navigator) {
-      // Service workers are supported. Use them.
-      window.addEventListener('load', function () {
-        // Wait for registration to finish before dropping the <script> tag.
-        // Otherwise, the browser will load the script multiple times,
-        // potentially different versions.
-        var serviceWorkerUrl = 'flutter_service_worker.js?v=' + serviceWorkerVersion;
-        navigator.serviceWorker.register(serviceWorkerUrl)
-          .then((reg) => {
-            function waitForActivation(serviceWorker) {
-              serviceWorker.addEventListener('statechange', () => {
-                if (serviceWorker.state == 'activated') {
-                  console.log('Installed new service worker.');
-                  loadMainDartJs();
-                }
-              });
-            }
-            if (!reg.active && (reg.installing || reg.waiting)) {
-              // No active web worker and we have installed or are installing
-              // one for the first time. Simply wait for it to activate.
-              waitForActivation(reg.installing || reg.waiting);
-            } else if (!reg.active.scriptURL.endsWith(serviceWorkerVersion)) {
-              // When the app updates the serviceWorkerVersion changes, so we
-              // need to ask the service worker to update.
-              console.log('New service worker available.');
-              reg.update();
-              waitForActivation(reg.installing);
-            } else {
-              // Existing service worker is still good.
-              console.log('Loading app from service worker.');
+<body>
+<!-- Splash screen -->
+<div id="splash">
+  <img id="splash-logo" src="splash_logo.png" alt="N47 Logo" />
+  <div id="loading-text">
+    Loading
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+</div>
+
+<style>
+  #splash {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url("snow_splash.jpg") center center no-repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.6s ease;
+  }
+
+  #splash-logo {
+    width: 180px;
+    margin-bottom: 30px;
+    animation: fadeInUp 1s ease forwards;
+  }
+
+  #loading-text {
+    color: white;
+    font-size: 20px;
+    font-family: sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: fadeInUp 1s ease 0.5s forwards;
+    opacity: 0;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: white;
+    animation: bounce 1.2s infinite ease-in-out;
+  }
+
+  .dot:nth-child(1) { animation-delay: 0s; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes fadeInUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(1); }
+    40% { transform: scale(1.5); }
+  }
+</style>
+
+<script>
+  const serviceWorkerVersion = '{{flutter_service_worker_version}}';
+  let scriptLoaded = false;
+
+  function loadMainDartJs() {
+    if (scriptLoaded) return;
+    scriptLoaded = true;
+    const scriptTag = document.createElement('script');
+    scriptTag.src = 'main.dart.js';
+    scriptTag.type = 'application/javascript';
+    document.body.appendChild(scriptTag);
+  }
+
+  function waitForFlutterRender() {
+    const observer = new MutationObserver(() => {
+      const flutterRoot = document.querySelector('flt-glass-pane');
+      if (flutterRoot) {
+        const splash = document.getElementById('splash');
+        if (splash) {
+          splash.style.opacity = '0';
+          setTimeout(() => splash.remove(), 700);
+        }
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      const swUrl = 'flutter_service_worker.js?v=' + serviceWorkerVersion;
+      navigator.serviceWorker.register(swUrl).then((reg) => {
+        function waitForActivation(sw) {
+          sw.addEventListener('statechange', () => {
+            if (sw.state === 'activated') {
               loadMainDartJs();
+              waitForFlutterRender();
             }
           });
+        }
 
-        // If service worker doesn't succeed in a reasonable amount of time,
-        // fallback to plaint <script> tag.
-        setTimeout(() => {
-          if (!scriptLoaded) {
-            console.warn(
-              'Failed to load app from service worker. Falling back to plain <script> tag.',
-            );
-            loadMainDartJs();
-          }
-        }, 4000);
+        if (!reg.active && (reg.installing || reg.waiting)) {
+          waitForActivation(reg.installing || reg.waiting);
+        } else if (!reg.active.scriptURL.endsWith(serviceWorkerVersion)) {
+          reg.update();
+          waitForActivation(reg.installing);
+        } else {
+          loadMainDartJs();
+          waitForFlutterRender();
+        }
       });
-    } else {
-      // Service workers not supported. Just drop the <script> tag.
-      loadMainDartJs();
-    }
-  </script>
-  <script src="https://www.google.com/recaptcha/api.js?render=6LeJKCcrAAAAAB5_i37B7M-maDo21Zqao9mrzZ07"></script>
+
+      setTimeout(() => {
+        if (!scriptLoaded) {
+          loadMainDartJs();
+          waitForFlutterRender();
+        }
+      }, 4000);
+    });
+  } else {
+    loadMainDartJs();
+    waitForFlutterRender();
+  }
+</script>
+</body>
+
+
+<script src="https://www.google.com/recaptcha/api.js?render=6LeJKCcrAAAAAB5_i37B7M-maDo21Zqao9mrzZ07"></script>
 </body>
 </html>
