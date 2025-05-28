@@ -58,6 +58,10 @@ class N47App extends StatelessWidget {
         supportedLocales: const [Locale('en')],
         theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,
+          fontFamily: 'system-ui',
+          textTheme: Typography.blackMountainView.apply(
+            fontFamily: 'system-ui',
+          ),
         ),
         onGenerateRoute: AppRouter.generateRoute,
         home: const Stack(
