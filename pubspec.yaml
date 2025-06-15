@@ -42,11 +42,11 @@ dependencies:
   json_annotation: ^4.9.0
   firebase_core: ^3.13.0
   firebase_storage: ^12.4.5
-  firebase_app_check: ^0.3.2+5
+  firebase_app_check: ^0.3.2+7
   firebase_auth: ^5.5.2
   cached_network_image: ^3.4.1
   shared_preferences: ^2.5.3
-  tuple: ^2.0.2
+  shared_preferences_web: ^2.4.3
 
 dev_dependencies:
   flutter_test:

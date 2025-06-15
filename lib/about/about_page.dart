@@ -1,3 +1,4 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -32,6 +33,8 @@ class AboutPage extends StatelessWidget {
   }
 
   Widget buildContent(BuildContext context) {
+    // String? appCheckToken;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
@@ -66,6 +69,44 @@ class AboutPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 60),
+
+                    // // ✅ 添加一个按钮和 TextField 显示 token
+                    // StatefulBuilder(
+                    //   builder: (context, setState) {
+                    //     return Column(
+                    //       children: [
+                    //         ElevatedButton(
+                    //           onPressed: () async {
+                    //             try {
+                    //               final token = await FirebaseAppCheck.instance.getToken(true);
+                    //               setState(() {
+                    //                 appCheckToken = token;
+                    //               });
+                    //             } catch (e) {
+                    //               setState(() {
+                    //                 appCheckToken = '获取失败: $e';
+                    //               });
+                    //             }
+                    //           },
+                    //           child: const Text("显示 App Check Token"),
+                    //         ),
+                    //         const SizedBox(height: 10),
+                    //         Container(
+                    //           padding: const EdgeInsets.all(12),
+                    //           decoration: BoxDecoration(
+                    //             border: Border.all(color: Colors.grey),
+                    //             borderRadius: BorderRadius.circular(4),
+                    //           ),
+                    //           width: double.infinity,
+                    //           child: Text(
+                    //             appCheckToken ?? '点击按钮获取 token',
+                    //             style: const TextStyle(fontSize: 12),
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     );
+                    //   },
+                    // ),
                   ],
                 ),
               ),
@@ -77,3 +118,4 @@ class AboutPage extends StatelessWidget {
     );
   }
 }
+

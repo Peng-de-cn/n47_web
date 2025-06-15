@@ -1,4 +1,5 @@
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,7 +24,7 @@ void main() async {
   );
 
   await FirebaseAppCheck.instance.activate(
-    webProvider: ReCaptchaV3Provider('6LeJKCcrAAAAAB5_i37B7M-maDo21Zqao9mrzZ07'),
+      webProvider: ReCaptchaV3Provider('6LffD2ErAAAAAPL21bf7tvVsXY8Cc6zqMzwSqBPz')
   );
 
   await FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(true);
