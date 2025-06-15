@@ -31,11 +31,6 @@
 .pub/
 /build/
 
-# Web related
-# Firebase
-lib/firebase_options.dart
-
-
 # Symbolication related
 app.*.symbols
 
