@@ -68,10 +68,14 @@ class Firestore {
 
   static Future<String?> loadImageUrl(String imagePath) async {
     try {
-      final ref = FirebaseStorage.instance.ref(imagePath);
-      final url = await ref.getDownloadURL();
-      logger.d('Successfully loaded image URL: $url');
-      return url;
+      if (imagePath.startsWith("assets")) {
+        return imagePath;
+      } else {
+        final ref = FirebaseStorage.instance.ref(imagePath);
+        final url = await ref.getDownloadURL();
+        logger.d('Successfully loaded image URL: $url');
+        return url;
+      }
     } catch (e, stackTrace) {
       logger.e('Failed to load image: $e, error:$e, stackTrace: $stackTrace');
       return null;

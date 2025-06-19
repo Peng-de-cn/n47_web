@@ -1,5 +1,6 @@
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +12,7 @@ import 'package:n47_web/l10n/generated/app_localizations.dart';
 import 'package:n47_web/navigation/AppRouter.dart';
 import 'package:n47_web/utils/logger_util.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:n47_web/utils/util.dart';
 import 'bloc/future_events_cubit.dart';
 import 'bloc/history_events_cubit.dart';
 import 'cookie/cookie_consent_overlay.dart';
@@ -26,7 +28,6 @@ void main() async {
   await FirebaseAppCheck.instance.activate(
       webProvider: ReCaptchaV3Provider('6LffD2ErAAAAAPL21bf7tvVsXY8Cc6zqMzwSqBPz')
   );
-
   await FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(true);
 
   await EventRepository.init();

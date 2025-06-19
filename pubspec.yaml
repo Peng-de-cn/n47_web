@@ -81,6 +81,10 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/future/mobile/
+    - assets/images/future/web/
+    - assets/images/history/mobile/
+    - assets/images/history/web/
     - assets/icons/
     - assets/data/
     - assets/qr/

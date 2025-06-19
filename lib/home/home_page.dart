@@ -291,15 +291,7 @@ class _HomePageState extends State<HomePage> {
                     return buildErrorWidget();
                   }
 
-                  return CachedNetworkImage(
-                    imageUrl: url,
-                    fit: BoxFit.cover,
-                    placeholder: (_, __) => buildLoadingWidget(),
-                    errorWidget: (_, url, error) => buildErrorWidget(),
-                    maxWidthDiskCache: kIsWeb ? null : 1024,
-                    fadeInDuration: const Duration(milliseconds: 200),
-                    imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
-                  );
+                  return smartImage(url);
                 },
               ),
             ),
@@ -366,15 +358,7 @@ class _HomePageState extends State<HomePage> {
                     return buildErrorWidget();
                   }
 
-                  return CachedNetworkImage(
-                    imageUrl: url,
-                    fit: BoxFit.cover,
-                    placeholder: (_, __) => buildLoadingWidget(),
-                    errorWidget: (_, url, error) => buildErrorWidget(),
-                    maxWidthDiskCache: kIsWeb ? null : 1024,
-                    fadeInDuration: const Duration(milliseconds: 200),
-                    imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
-                  );
+                  return smartImage(url);
                 },
               ),
             ),
@@ -426,4 +410,24 @@ class _HomePageState extends State<HomePage> {
         color: Colors.grey[200],
         child: const Icon(Icons.broken_image),
       );
+
+  Widget smartImage(String url) {
+    if (url.startsWith('assets')) {
+      return Image.asset(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => buildErrorWidget(),
+      );
+    } else {
+      return CachedNetworkImage(
+        imageUrl: url,
+        fit: BoxFit.cover,
+        placeholder: (_, __) => buildLoadingWidget(),
+        errorWidget: (_, url, error) => buildErrorWidget(),
+        maxWidthDiskCache: kIsWeb ? null : 1024,
+        fadeInDuration: const Duration(milliseconds: 200),
+        imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
+      );
+    }
+  }
 }
