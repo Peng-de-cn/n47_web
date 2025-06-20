@@ -4,6 +4,7 @@ import 'package:n47_web/sponsors/sponsor_item.dart';
 import '../footer/app_footer.dart';
 import '../header/app_header.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../refreshable/refreshable_page.dart';
 import '../utils/util.dart';
 
 class SponsorsPage extends StatelessWidget {
@@ -21,22 +22,22 @@ class SponsorsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Stack(
-          children: [
-            Container(
-              color: Colors.white,
-            ),
-            const AppHeader(),
-            Positioned(
-              top: Util.isMobile(context) ? 60 : 100,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: buildContent(context),
-            ),
-          ],
-        )
+    return RefreshablePage(
+      child: Stack(
+        children: [
+          Container(
+            color: Colors.white,
+          ),
+          const AppHeader(),
+          Positioned(
+            top: Util.isMobile(context) ? 60 : 80,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: buildContent(context),
+          ),
+        ],
+      ),
     );
   }
 

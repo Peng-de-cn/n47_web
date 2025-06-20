@@ -23,7 +23,7 @@ class HistoryPageState extends State<HistoryPage> {
   final ScrollController _scrollController = ScrollController();
   int _currentSeasonIndex = 0;
   List<String> _availableSeasons = [];
-  late List<List<Event>> _seasonalEvents;
+  List<List<Event>> _seasonalEvents = [];
   final List<Color> _alternateColors = [
     const Color(0xFFF5F5F5),
     const Color(0xFFEDEDED),
@@ -32,7 +32,7 @@ class HistoryPageState extends State<HistoryPage> {
   @override
   void initState() {
     super.initState();
-    _loadAvailableSeasons();
+    _loadInitialData();
   }
 
   @override
@@ -41,26 +41,28 @@ class HistoryPageState extends State<HistoryPage> {
     super.dispose();
   }
 
-  void _loadAvailableSeasons() {
-    final events = context.read<HistoryEventsCubit>().state;
+  Future<void> _loadInitialData() async {
+      final cubit = context.read<HistoryEventsCubit>();
+      await cubit.initializeFirebaseData();
+      await cubit.loadEvents();
+      _processEvents(cubit.state);
+  }
 
-    // 分组到各个雪季
+  void _processEvents(List<Event> events) {
     final seasonMap = <String, List<Event>>{};
 
     for (final event in events) {
       final date = _parseDate(event.date);
       final season = _getSeasonForDate(date);
-
       seasonMap.putIfAbsent(season, () => []).add(event);
     }
 
-    // 获取所有雪季并按时间排序(最新的在前)
-    _availableSeasons = seasonMap.keys.toList()..sort((a, b) => _parseSeason(b).compareTo(_parseSeason(a)));
-
-    // 保存每个雪季的事件列表
-    _seasonalEvents = _availableSeasons.map((s) => seasonMap[s]!).toList();
-
     setState(() {
+      // 获取所有雪季并按时间排序(最新的在前)
+      _availableSeasons = seasonMap.keys.toList()
+        ..sort((a, b) => _parseSeason(b).compareTo(_parseSeason(a)));
+      // 保存每个雪季的事件列表
+      _seasonalEvents = _availableSeasons.map((s) => seasonMap[s]!).toList();
       if (_availableSeasons.isNotEmpty) {
         _currentSeasonIndex = 0;
       }

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/foundation.dart';
@@ -27,7 +26,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool _initialized = false;
   bool _backgroundLoaded = false;
 
   @override
@@ -40,11 +38,6 @@ class _HomePageState extends State<HomePage> {
       await precacheImage(AssetImage(backgroundImage), context);
       setState(() => _backgroundLoaded = true);
 
-      final historyCubit = context.read<HistoryEventsCubit>();
-      await historyCubit.initializeFirebaseData();
-      historyCubit.loadEvents();
-
-      setState(() => _initialized = true);
     });
   }
 
@@ -122,7 +115,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        if (!_initialized || events.isEmpty)
+        if (events.isEmpty)
           const SliverToBoxAdapter(
             child: Center(
               child: Padding(
