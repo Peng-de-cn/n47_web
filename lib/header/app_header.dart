@@ -56,7 +56,7 @@ class AppHeader extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     _buildNavItem(context, AppLocalizations.of(context)!.naviHistory, '/history'),
-                    _buildNavItem(context, AppLocalizations.of(context)!.naviSponsors, '/sponsors'),
+                    _buildNavItem(context, AppLocalizations.of(context)!.naviSupporters, '/supporters'),
                     _buildNavItem(context, AppLocalizations.of(context)!.naviContact, '/contact'),
                     _buildNavItem(context, AppLocalizations.of(context)!.naviAbout, '/about'),
                   ],
@@ -85,7 +85,7 @@ class AppHeader extends StatelessWidget {
               children: [
                 _buildNavItem(context, AppLocalizations.of(context)!.naviHistory, '/history'),
                 const SizedBox(width: 20),
-                _buildNavItem(context, AppLocalizations.of(context)!.naviSponsors, '/sponsors'),
+                _buildNavItem(context, AppLocalizations.of(context)!.naviSupporters, '/supporters'),
                 const SizedBox(width: 20),
                 _buildNavItem(context, AppLocalizations.of(context)!.naviContact, '/contact'),
                 const SizedBox(width: 20),
@@ -106,7 +106,7 @@ class AppHeader extends StatelessWidget {
             children: [
               _buildNavItem(context, AppLocalizations.of(context)!.naviHistory, '/history'),
               const SizedBox(width: 20),
-              _buildNavItem(context, AppLocalizations.of(context)!.naviSponsors, '/sponsors'),
+              _buildNavItem(context, AppLocalizations.of(context)!.naviSupporters, '/supporters'),
               const SizedBox(width: 20),
               _buildNavItem(context, AppLocalizations.of(context)!.naviContact, '/contact'),
               const SizedBox(width: 20),

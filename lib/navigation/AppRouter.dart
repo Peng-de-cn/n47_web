@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:n47_web/about/about_page.dart';
 import 'package:n47_web/history/history_page.dart';
 import '../contact/contact_page.dart';
-import '../sponsors/sponsors_page.dart';
+import '../supporters/supporters_page.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/history':
         return createFadeRoute(HistoryPage(), settings);
-      case '/sponsors':
-        return createFadeRoute(SponsorsPage(), settings);
+      case '/supporters':
+        return createFadeRoute(SupportersPage(), settings);
       case '/contact':
         return createFadeRoute(ContactPage(), settings);
       case '/about':

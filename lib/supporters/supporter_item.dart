@@ -7,12 +7,12 @@ import 'package:url_launcher/url_launcher.dart';
 import '../utils/logger_util.dart';
 import 'dart:html' as html;
 
-class SponsorItem extends StatelessWidget {
+class SupporterItem extends StatelessWidget {
   final String imagePath;
   final String url;
   final double maxSize;
 
-  const SponsorItem({
+  const SupporterItem({
     required this.imagePath,
     required this.url,
     required this.maxSize,

@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:n47_web/sponsors/sponsor_item.dart';
+import 'package:n47_web/supporters/supporter_item.dart';
 import '../footer/app_footer.dart';
 import '../header/app_header.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../refreshable/refreshable_page.dart';
 import '../utils/util.dart';
 
-class SponsorsPage extends StatelessWidget {
-  SponsorsPage({super.key});
+class SupportersPage extends StatelessWidget {
+  SupportersPage({super.key});
 
-  final List<Map<String, String>> sponsors = [
-    {'image': 'assets/sponsors/nitro.jpg', 'url': 'https://nitrosnowboards.com'},
-    {'image': 'assets/sponsors/jones.jpg', 'url': 'https://www.jonessnowboards.com'},
-    {'image': 'assets/sponsors/nidecker.jpg', 'url': 'https://www.nidecker.com'},
-    {'image': 'assets/sponsors/yes.jpg', 'url': 'https://yessnowboards.com'},
-    {'image': 'assets/sponsors/goski.jpg', 'url': ''},
-    {'image': 'assets/sponsors/stadele.jpg', 'url': 'https://www.stadele.eu'},
-    {'image': 'assets/sponsors/snowland.jpg', 'url': ''},
+  final List<Map<String, String>> supporters = [
+    {'image': 'assets/supporters/nitro.jpg', 'url': 'https://nitrosnowboards.com'},
+    {'image': 'assets/supporters/jones.jpg', 'url': 'https://www.jonessnowboards.com'},
+    {'image': 'assets/supporters/nidecker.jpg', 'url': 'https://www.nidecker.com'},
+    {'image': 'assets/supporters/yes.jpg', 'url': 'https://yessnowboards.com'},
+    {'image': 'assets/supporters/elooa.jpg', 'url': 'https://elooa.com'},
+    {'image': 'assets/supporters/total.jpg', 'url': 'https://www.skischuletotal.at/'},
+    {'image': 'assets/supporters/goski.jpg', 'url': ''},
+    {'image': 'assets/supporters/stadele.jpg', 'url': 'https://www.stadele.eu'},
+    {'image': 'assets/supporters/snowland.jpg', 'url': ''},
   ];
 
   @override
@@ -70,7 +72,7 @@ class SponsorsPage extends StatelessWidget {
                   20,
                 ),
                 child: Text(
-                  AppLocalizations.of(context)!.sponsorsTitle,
+                  AppLocalizations.of(context)!.supportersTitle,
                   style: GoogleFonts.inter(
                     fontSize: getResponsiveValue(
                       context,
@@ -94,11 +96,11 @@ class SponsorsPage extends StatelessWidget {
                     crossAxisSpacing: getSpacingValue(context),
                     childAspectRatio: 1,
                   ),
-                  itemCount: sponsors.length,
+                  itemCount: supporters.length,
                   itemBuilder: (context, index) {
-                    return SponsorItem(
-                      imagePath: sponsors[index]['image']!,
-                      url: sponsors[index]['url']!,
+                    return SupporterItem(
+                      imagePath: supporters[index]['image']!,
+                      url: supporters[index]['url']!,
                       maxSize: calculateMaxItemSize(
                         context,
                         constraints.maxWidth,

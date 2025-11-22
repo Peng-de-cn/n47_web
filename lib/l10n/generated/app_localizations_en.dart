@@ -15,7 +15,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get naviHistory => 'History';
 
   @override
-  String get naviSponsors => 'Sponsors';
+  String get naviSupporters => 'Supporters';
 
   @override
   String get naviContact => 'Contact';
@@ -72,7 +72,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historyTab => 'Season';
 
   @override
-  String get sponsorsTitle => 'Our Sponsors';
+  String get supportersTitle => 'Our Supporters';
 
   @override
   String get aboutTitle => 'WHO WE ARE';

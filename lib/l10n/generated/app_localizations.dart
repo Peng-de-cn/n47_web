@@ -105,11 +105,11 @@ abstract class AppLocalizations {
   /// **'History'**
   String get naviHistory;
 
-  /// No description provided for @naviSponsors.
+  /// No description provided for @naviSupporters.
   ///
   /// In en, this message translates to:
-  /// **'Sponsors'**
-  String get naviSponsors;
+  /// **'Supporters'**
+  String get naviSupporters;
 
   /// No description provided for @naviContact.
   ///
@@ -219,11 +219,11 @@ abstract class AppLocalizations {
   /// **'Season'**
   String get historyTab;
 
-  /// No description provided for @sponsorsTitle.
+  /// No description provided for @supportersTitle.
   ///
   /// In en, this message translates to:
-  /// **'Our Sponsors'**
-  String get sponsorsTitle;
+  /// **'Our Supporters'**
+  String get supportersTitle;
 
   /// No description provided for @aboutTitle.
   ///
