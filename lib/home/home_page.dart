@@ -1,16 +1,12 @@
-import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:n47_web/firebase/fire_store.dart';
 import 'package:n47_web/header/app_header.dart';
 import 'package:n47_web/home/home_bloc.dart';
 import 'package:n47_web/home/scrolldown_indicator.dart';
 import '../bloc/future_events_cubit.dart';
-import '../bloc/history_events_cubit.dart';
 import '../database/event.dart';
 import '../footer/app_footer.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -71,7 +67,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildContent(BuildContext context, List<Event> events) {
+  Widget buildContent(BuildContext context, List<EventHive> events) {
     final isMobile = Util.isMobile(context);
     final scrollController = ScrollController();
     final mediaQuery = MediaQuery.of(context);
@@ -135,10 +131,10 @@ class _HomePageState extends State<HomePage> {
                       begin: Alignment(0.0, -1.0),
                       end: Alignment(0.0, 0.5),
                       colors: [
-                        Colors.white.withOpacity(0.6),
-                        Colors.white.withOpacity(0.7),
-                        Colors.white.withOpacity(0.8),
-                        Colors.white.withOpacity(0.9),
+                        Colors.white.withValues(alpha: 0.6),
+                        Colors.white.withValues(alpha: 0.7),
+                        Colors.white.withValues(alpha: 0.8),
+                        Colors.white.withValues(alpha: 0.9),
                         Colors.white,
                       ],
                       stops: [0.6, 0.7, 0.8, 0.9, 1.0],
@@ -161,7 +157,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildDesktopLayout(int index, Event event) {
+  Widget buildDesktopLayout(int index, EventHive event) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 20.0),
       child: LayoutBuilder(
@@ -199,7 +195,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildDesktopTextContent(Event event) {
+  Widget buildDesktopTextContent(EventHive event) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Align(
@@ -237,7 +233,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildDesktopImageContent(Event event) {
+  Widget buildDesktopImageContent(EventHive event) {
     return Padding(
       padding: const EdgeInsets.all(20.20),
       child: GestureDetector(
@@ -248,12 +244,12 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 15,
                 offset: const Offset(0, 10),
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 5,
                 offset: const Offset(0, 2),
               ),
@@ -294,7 +290,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildMobileLayout(int index, Event event, int eventsLength) {
+  Widget buildMobileLayout(int index, EventHive event, int eventsLength) {
     return Column(
       children: [
         buildMobileImageContent(event),
@@ -304,7 +300,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildMobileImageContent(Event event) {
+  Widget buildMobileImageContent(EventHive event) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
       child: GestureDetector(
@@ -315,12 +311,12 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 15,
                 offset: const Offset(0, 10),
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 5,
                 offset: const Offset(0, 2),
               ),
@@ -361,7 +357,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildMobileTextContent(Event event, bool alignLeft) {
+  Widget buildMobileTextContent(EventHive event, bool alignLeft) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
       child: Column(

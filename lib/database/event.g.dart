@@ -6,29 +6,29 @@ part of 'event.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class EventAdapter extends TypeAdapter<Event> {
+class EventHiveAdapter extends TypeAdapter<EventHive> {
   @override
-  final int typeId = 0;
+  final typeId = 0;
 
   @override
-  Event read(BinaryReader reader) {
+  EventHive read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Event(
-      id: fields[0] as String,
-      title: fields[1] as String,
-      date: fields[2] as String,
-      dateText: fields[3] as String,
-      description: fields[4] as String,
-      imageWeb: fields[5] as String,
-      imageMobile: fields[6] as String,
+    return EventHive(
+      id: fields[0] == null ? '' : fields[0] as String,
+      title: fields[1] == null ? '' : fields[1] as String,
+      date: fields[2] == null ? '' : fields[2] as String,
+      dateText: fields[3] == null ? '' : fields[3] as String,
+      description: fields[4] == null ? '' : fields[4] as String,
+      imageWeb: fields[5] == null ? '' : fields[5] as String,
+      imageMobile: fields[6] == null ? '' : fields[6] as String,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Event obj) {
+  void write(BinaryWriter writer, EventHive obj) {
     writer
       ..writeByte(7)
       ..writeByte(0)
@@ -53,7 +53,7 @@ class EventAdapter extends TypeAdapter<Event> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is EventAdapter &&
+      other is EventHiveAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -62,7 +62,7 @@ class EventAdapter extends TypeAdapter<Event> {
 // JsonSerializableGenerator
 // **************************************************************************
 
-Event _$EventFromJson(Map<String, dynamic> json) => Event(
+EventDto _$EventDtoFromJson(Map<String, dynamic> json) => EventDto(
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? '',
       date: json['date'] as String? ?? '',
@@ -72,7 +72,7 @@ Event _$EventFromJson(Map<String, dynamic> json) => Event(
       imageMobile: json['imageMobile'] as String? ?? '',
     );
 
-Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
+Map<String, dynamic> _$EventDtoToJson(EventDto instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'date': instance.date,

@@ -19,7 +19,6 @@ class SupportersPage extends StatelessWidget {
     {'image': 'assets/supporters/total.jpg', 'url': 'https://www.skischuletotal.at/'},
     {'image': 'assets/supporters/goski.jpg', 'url': ''},
     {'image': 'assets/supporters/stadele.jpg', 'url': 'https://www.stadele.eu'},
-    {'image': 'assets/supporters/snowland.jpg', 'url': ''},
   ];
 
   @override

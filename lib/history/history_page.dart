@@ -23,7 +23,7 @@ class HistoryPageState extends State<HistoryPage> {
   final ScrollController _scrollController = ScrollController();
   int _currentSeasonIndex = 0;
   List<String> _availableSeasons = [];
-  List<List<Event>> _seasonalEvents = [];
+  List<List<EventHive>> _seasonalEvents = [];
   final List<Color> _alternateColors = [
     const Color(0xFFF5F5F5),
     const Color(0xFFEDEDED),
@@ -48,8 +48,8 @@ class HistoryPageState extends State<HistoryPage> {
       _processEvents(cubit.state);
   }
 
-  void _processEvents(List<Event> events) {
-    final seasonMap = <String, List<Event>>{};
+  void _processEvents(List<EventHive> events) {
+    final seasonMap = <String, List<EventHive>>{};
 
     for (final event in events) {
       final date = _parseDate(event.date);
@@ -123,7 +123,7 @@ class HistoryPageState extends State<HistoryPage> {
     return DateTime(startYear, 10);
   }
 
-  List<Event> _getEventsForCurrentSeason() {
+  List<EventHive> _getEventsForCurrentSeason() {
     if (_availableSeasons.isEmpty) return [];
     return _seasonalEvents[_currentSeasonIndex];
   }
@@ -208,7 +208,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildContent(List<Event> events, BuildContext context) {
+  Widget buildContent(List<EventHive> events, BuildContext context) {
     return CustomScrollView(
       controller: _scrollController,
       slivers: [
@@ -236,7 +236,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildDesktopLayout(int index, Event event) {
+  Widget buildDesktopLayout(int index, EventHive event) {
     return Container(
       color: _alternateColors[index % 2],
       padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 30.0),
@@ -275,7 +275,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildDesktopTextContent(Event event) {
+  Widget buildDesktopTextContent(EventHive event) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Align(
@@ -313,7 +313,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildDesktopImageContent(Event event) {
+  Widget buildDesktopImageContent(EventHive event) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: GestureDetector(
@@ -324,12 +324,12 @@ class HistoryPageState extends State<HistoryPage> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 15,
                 offset: const Offset(0, 10),
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 5,
                 offset: const Offset(0, 2),
               ),
@@ -370,7 +370,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildMobileLayout(int index, Event event, int eventsLength) {
+  Widget buildMobileLayout(int index, EventHive event, int eventsLength) {
     return Column(
       children: [
         buildMobileImageContent(event),
@@ -380,7 +380,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildMobileImageContent(Event event) {
+  Widget buildMobileImageContent(EventHive event) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
       child: GestureDetector(
@@ -391,12 +391,12 @@ class HistoryPageState extends State<HistoryPage> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 15,
                 offset: const Offset(0, 10),
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 5,
                 offset: const Offset(0, 2),
               ),
@@ -437,7 +437,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildMobileTextContent(Event event, bool alignLeft) {
+  Widget buildMobileTextContent(EventHive event, bool alignLeft) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
       child: Column(
