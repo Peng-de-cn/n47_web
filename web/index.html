@@ -18,6 +18,7 @@
   <title>N47</title>
   <link rel="manifest" href="manifest.json">
 
+  <!-- 预加载 Splash 静态资源 -->
   <link rel="preload" href="snow_splash.jpg" as="image">
   <link rel="preload" href="splash_logo.png" as="image">
   <link rel="preconnect" href="https://firestore.googleapis.com">
@@ -59,7 +60,7 @@
       width: 180px;
       margin-bottom: 30px;
       animation: fadeInUp 1s ease forwards;
-      transform: translateZ(0); /* 防止 GPU 抖动 */
+      transform: translateZ(0);
       will-change: transform, opacity;
     }
 
@@ -101,8 +102,8 @@
     }
   </style>
 
-  <!-- 1. 引入新版 Flutter Web bootstrap 脚本 -->
-  <script src="flutter_bootstrap.js" async></script>
+  <!-- 💡 核心修改 1：使用 Flutter 官方唯一的 bootstrap 占位符 -->
+  {{flutter_bootstrap_js}}
 </head>
 <body>
 
@@ -130,30 +131,14 @@
     }
   }
 
-  // 配置 Flutter Web 初始化钩子，在 runApp() 后隐藏 Splash
-  {{flutter_js}}
-  {{flutter_build_config}}
-
-  // 监听 Flutter 渲染启动流程
-  window.addEventListener('load', function () {
-    if (window._flutter && window._flutter.loader) {
-      _flutter.loader.load({
-        onEntrypointLoaded: async function(engineInitializer) {
-          try {
-            const appRunner = await engineInitializer.initializeEngine();
-            await appRunner.runApp();
-          } catch (e) {
-            console.error("Flutter 启动异常:", e);
-          } finally {
-            hideSplash();
-          }
-        }
-      });
-    } else {
-      // 兜底：如果直接使用 flutter_bootstrap.js 启动
-      setTimeout(hideSplash, 3000);
-    }
+  // 💡 核心修改 2：监听 Flutter 引擎在 DOM 中创建的首帧视图（flutter-first-frame）
+  // 当 Flutter 完成第一帧渲染时，立刻移除 Splash 屏，保证 100% 成功跳转
+  window.addEventListener('flutter-first-frame', function () {
+    hideSplash();
   });
+
+  // 💡 核心修改 3：增加一个 5 秒的绝对安全兜底，防止因网络原因阻塞导致 Splash 死锁
+  setTimeout(hideSplash, 5000);
 </script>
 
 </body>
