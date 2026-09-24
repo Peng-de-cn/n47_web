@@ -33,7 +33,7 @@ dependencies:
   shared_preferences_web: ^2.4.3
 
   # Firebase Core & Products
-  firebase_core: ^3.12.1
+  firebase_core: ^3.15.2
   firebase_auth: ^5.5.1
   cloud_firestore: ^5.6.5
   firebase_storage: ^12.4.4
