@@ -14,7 +14,7 @@ class SupportersPage extends StatelessWidget {
     {'image': 'assets/supporters/nitro.jpg', 'url': 'https://nitrosnowboards.com'},
     {'image': 'assets/supporters/jones.jpg', 'url': 'https://www.jonessnowboards.com'},
     {'image': 'assets/supporters/nidecker.jpg', 'url': 'https://www.nidecker.com'},
-    {'image': 'assets/supporters/yes.jpg', 'url': 'https://yessnowboards.com'},
+    {'image': 'assets/supporters/thirtytwo.jpg', 'url': 'https://thirtytwo.com'},
     {'image': 'assets/supporters/elooa.jpg', 'url': 'https://elooa.com'},
     {'image': 'assets/supporters/total.jpg', 'url': 'https://www.skischuletotal.at/'},
     {'image': 'assets/supporters/goski.jpg', 'url': ''},

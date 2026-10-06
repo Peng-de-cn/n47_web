@@ -54,3 +54,4 @@ id_rsa.pub
 /functions/*.log
 /functions/.env
 /functions/package-lock.json
+/functions/src/serviceAccountKey.json
