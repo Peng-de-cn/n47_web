@@ -2,22 +2,28 @@ import * as admin from 'firebase-admin';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// 1. 初始化 Firebase Admin
-// 如果在本地运行，通常需要提供 Service Account Key；
-// 如果在已配置 GOOGLE_APPLICATION_CREDENTIALS 的环境中，可直接 admin.initializeApp()
-if (!admin.apps.length) {
-  // 查找 serviceAccountKey.json（如果放在 functions 目录下）
-  const serviceAccountPath = path.resolve(__dirname, '../serviceAccountKey.json');
+// 1. 明确指定 serviceAccountKey.json 文件的真实绝对路径
+// 如果 serviceAccountKey.json 放在 functions 根目录下：
+const serviceAccountPath = path.resolve(__dirname, '../src/serviceAccountKey.json');
 
-  if (fs.existsSync(serviceAccountPath)) {
-    const serviceAccount = require(serviceAccountPath);
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
-    });
-  } else {
-    // 尝试使用默认凭据初始化
-    admin.initializeApp();
-  }
+// 如果你把 serviceAccountKey.json 放在 functions/src 目录下，解除下面这行的注释：
+// const serviceAccountPath = path.resolve(__dirname, './serviceAccountKey.json');
+
+if (!fs.existsSync(serviceAccountPath)) {
+  console.error(`❌ 找不到密钥文件，请确认 serviceAccountKey.json 存放的位置: ${serviceAccountPath}`);
+  process.exit(1);
+}
+
+const serviceAccount = require(serviceAccountPath);
+
+// 初始化 Firebase Admin 并传入 credential 凭据
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    // 如果 serviceAccountKey.json 里包含 project_id，会自动读取；
+    // 如果依然报错，可以手动加上 projectId 字段（取消下一行的注释并填入你的 Firebase Project ID）：
+    // projectId: 'your-firebase-project-id'
+  });
 }
 
 const db = admin.firestore();

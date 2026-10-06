@@ -32,8 +32,9 @@ class _HomePageState extends State<HomePage> {
       final backgroundImage = context.read<HomeBloc>().state.backgroundImage;
 
       await precacheImage(AssetImage(backgroundImage), context);
-      setState(() => _backgroundLoaded = true);
-
+      if (mounted) {
+        setState(() => _backgroundLoaded = true);
+      }
     });
   }
 
@@ -78,7 +79,9 @@ class _HomePageState extends State<HomePage> {
         SliverToBoxAdapter(
           child: Container(
             padding: EdgeInsets.only(
-              top: isMobile ? mediaQuery.size.height * 0.2 : mediaQuery.size.height * 0.3,
+              top: isMobile
+                  ? mediaQuery.size.height * 0.2
+                  : mediaQuery.size.height * 0.3,
               bottom: mediaQuery.size.height * 0.2,
             ),
             child: Padding(
@@ -123,13 +126,13 @@ class _HomePageState extends State<HomePage> {
         else
           SliverList(
             delegate: SliverChildBuilderDelegate(
-              (context, index) {
+                  (context, index) {
                 final event = events[index];
                 return Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      begin: Alignment(0.0, -1.0),
-                      end: Alignment(0.0, 0.5),
+                      begin: const Alignment(0.0, -1.0),
+                      end: const Alignment(0.0, 0.5),
                       colors: [
                         Colors.white.withValues(alpha: 0.6),
                         Colors.white.withValues(alpha: 0.7),
@@ -137,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                         Colors.white.withValues(alpha: 0.9),
                         Colors.white,
                       ],
-                      stops: [0.6, 0.7, 0.8, 0.9, 1.0],
+                      stops: const [0.6, 0.7, 0.8, 0.9, 1.0],
                     ),
                   ),
                   child: LayoutBuilder(
@@ -167,29 +170,29 @@ class _HomePageState extends State<HomePage> {
 
           return index % 2 == 0
               ? Row(
-                  children: [
-                    SizedBox(
-                      width: textWidth,
-                      child: buildDesktopTextContent(event),
-                    ),
-                    SizedBox(
-                      width: imageWidth,
-                      child: buildDesktopImageContent(event),
-                    ),
-                  ],
-                )
+            children: [
+              SizedBox(
+                width: textWidth,
+                child: buildDesktopTextContent(event),
+              ),
+              SizedBox(
+                width: imageWidth,
+                child: buildDesktopImageContent(event),
+              ),
+            ],
+          )
               : Row(
-                  children: [
-                    SizedBox(
-                      width: imageWidth,
-                      child: buildDesktopImageContent(event),
-                    ),
-                    SizedBox(
-                      width: textWidth,
-                      child: buildDesktopTextContent(event),
-                    ),
-                  ],
-                );
+            children: [
+              SizedBox(
+                width: imageWidth,
+                child: buildDesktopImageContent(event),
+              ),
+              SizedBox(
+                width: textWidth,
+                child: buildDesktopTextContent(event),
+              ),
+            ],
+          );
         },
       ),
     );
@@ -235,7 +238,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildDesktopImageContent(EventHive event) {
     return Padding(
-      padding: const EdgeInsets.all(20.20),
+      padding: const EdgeInsets.all(20.0),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {},
@@ -362,7 +365,7 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
       child: Column(
         crossAxisAlignment: alignLeft ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min, // Important: Avoid Infinite Scaling
+        mainAxisSize: MainAxisSize.min, // Avoid Infinite Scaling
         children: [
           Text(
             Util.formatHtmlText(event.dateText),
@@ -393,12 +396,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildLoadingWidget() => Center(child: CircularProgressIndicator());
+  Widget buildLoadingWidget() => const Center(child: CircularProgressIndicator());
 
   Widget buildErrorWidget() => Container(
-        color: Colors.grey[200],
-        child: const Icon(Icons.broken_image),
-      );
+    color: Colors.grey[200],
+    child: const Icon(Icons.broken_image),
+  );
 
   Widget smartImage(String url) {
     if (url.startsWith('assets')) {

@@ -42,10 +42,10 @@ class HistoryPageState extends State<HistoryPage> {
   }
 
   Future<void> _loadInitialData() async {
-      final cubit = context.read<HistoryEventsCubit>();
-      await cubit.initializeFirebaseData();
-      await cubit.loadEvents();
-      _processEvents(cubit.state);
+    final cubit = context.read<HistoryEventsCubit>();
+    await cubit.initializeFirebaseData();
+    await cubit.loadEvents();
+    _processEvents(cubit.state);
   }
 
   void _processEvents(List<EventHive> events) {
@@ -82,7 +82,7 @@ class HistoryPageState extends State<HistoryPage> {
         return DateTime(int.parse(year), month, int.parse(day));
       }
     } catch (e) {
-      logger.e('Error parsing date: $dateStr - $e');
+      logger.e('Error parsing date: $dateStr\n$e');
     }
     return DateTime.now();
   }
@@ -191,7 +191,7 @@ class HistoryPageState extends State<HistoryPage> {
         IconButton(
           icon: Icon(Icons.chevron_left, size: Util.isMobile(context) ? 28 : 32),
           onPressed: _currentSeasonIndex > 0 ? _goToPreviousSeason : null,
-          padding: Util.isMobile(context) ? EdgeInsets.all(8) : EdgeInsets.all(12),
+          padding: Util.isMobile(context) ? const EdgeInsets.all(8) : const EdgeInsets.all(12),
         ),
         Text(
           '${_availableSeasons[_currentSeasonIndex]} ${AppLocalizations.of(context)!.historyTab}',
@@ -203,6 +203,7 @@ class HistoryPageState extends State<HistoryPage> {
         IconButton(
           icon: Icon(Icons.chevron_right, size: Util.isMobile(context) ? 28 : 32),
           onPressed: _currentSeasonIndex < _availableSeasons.length - 1 ? _goToNextSeason : null,
+          padding: Util.isMobile(context) ? const EdgeInsets.all(8) : const EdgeInsets.all(12),
         ),
       ],
     );
@@ -214,7 +215,7 @@ class HistoryPageState extends State<HistoryPage> {
       slivers: [
         SliverList(
           delegate: SliverChildBuilderDelegate(
-            (context, index) {
+                (context, index) {
               final event = events[index];
               return LayoutBuilder(
                 builder: (context, constraints) {
@@ -247,29 +248,29 @@ class HistoryPageState extends State<HistoryPage> {
 
           return index % 2 == 0
               ? Row(
-                  children: [
-                    SizedBox(
-                      width: textWidth,
-                      child: buildDesktopTextContent(event),
-                    ),
-                    SizedBox(
-                      width: imageWidth,
-                      child: buildDesktopImageContent(event),
-                    ),
-                  ],
-                )
+            children: [
+              SizedBox(
+                width: textWidth,
+                child: buildDesktopTextContent(event),
+              ),
+              SizedBox(
+                width: imageWidth,
+                child: buildDesktopImageContent(event),
+              ),
+            ],
+          )
               : Row(
-                  children: [
-                    SizedBox(
-                      width: imageWidth,
-                      child: buildDesktopImageContent(event),
-                    ),
-                    SizedBox(
-                      width: textWidth,
-                      child: buildDesktopTextContent(event),
-                    ),
-                  ],
-                );
+            children: [
+              SizedBox(
+                width: imageWidth,
+                child: buildDesktopImageContent(event),
+              ),
+              SizedBox(
+                width: textWidth,
+                child: buildDesktopTextContent(event),
+              ),
+            ],
+          );
         },
       ),
     );
@@ -473,12 +474,12 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildLoadingWidget() => Center(child: CircularProgressIndicator());
+  Widget buildLoadingWidget() => const Center(child: CircularProgressIndicator());
 
   Widget buildErrorWidget() => Container(
-        color: Colors.grey[200],
-        child: const Icon(Icons.broken_image),
-      );
+    color: Colors.grey[200],
+    child: const Icon(Icons.broken_image),
+  );
 
   Widget smartImage(String url) {
     if (url.startsWith('assets')) {
@@ -495,7 +496,6 @@ class HistoryPageState extends State<HistoryPage> {
         errorWidget: (_, url, error) => buildErrorWidget(),
         maxWidthDiskCache: kIsWeb ? null : 1024,
         fadeInDuration: const Duration(milliseconds: 200),
-        imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
       );
     }
   }
