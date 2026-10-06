@@ -338,32 +338,40 @@ class HistoryPageState extends State<HistoryPage> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: AspectRatio(
-              aspectRatio: 3 / 4,
-              child: FutureBuilder<String?>(
-                future: Firestore.loadImageUrl(event.imageWeb),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return AnimatedOpacity(
-                      opacity: 0.5,
-                      duration: const Duration(milliseconds: 300),
-                      child: buildLoadingWidget(),
-                    );
-                  }
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth <= 0 || constraints.maxHeight <= 0) {
+                  return buildLoadingWidget();
+                }
 
-                  if (snapshot.hasError) {
-                    logger.e('Image load failed: ${snapshot.error}');
-                    return buildErrorWidget();
-                  }
+                return AspectRatio(
+                  aspectRatio: 3 / 4,
+                  child: FutureBuilder<String?>(
+                    future: Firestore.loadImageUrl(event.imageWeb),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return AnimatedOpacity(
+                          opacity: 0.5,
+                          duration: const Duration(milliseconds: 300),
+                          child: buildLoadingWidget(),
+                        );
+                      }
 
-                  final url = snapshot.data;
-                  if (url == null || url.isEmpty) {
-                    return buildErrorWidget();
-                  }
+                      if (snapshot.hasError) {
+                        logger.e('Image load failed: ${snapshot.error}');
+                        return buildErrorWidget();
+                      }
 
-                  return smartImage(url);
-                },
-              ),
+                      final url = snapshot.data;
+                      if (url == null || url.isEmpty) {
+                        return buildErrorWidget();
+                      }
+
+                      return smartImage(url);
+                    },
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -405,32 +413,40 @@ class HistoryPageState extends State<HistoryPage> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: AspectRatio(
-              aspectRatio: 4 / 3,
-              child: FutureBuilder<String?>(
-                future: Firestore.loadImageUrl(event.imageMobile),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return AnimatedOpacity(
-                      opacity: 0.5,
-                      duration: const Duration(milliseconds: 300),
-                      child: buildLoadingWidget(),
-                    );
-                  }
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth <= 0 || constraints.maxHeight <= 0) {
+                  return buildLoadingWidget();
+                }
 
-                  if (snapshot.hasError) {
-                    logger.e('Image load failed: ${snapshot.error}');
-                    return buildErrorWidget();
-                  }
+                return AspectRatio(
+                  aspectRatio: 4 / 3,
+                  child: FutureBuilder<String?>(
+                    future: Firestore.loadImageUrl(event.imageMobile),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return AnimatedOpacity(
+                          opacity: 0.5,
+                          duration: const Duration(milliseconds: 300),
+                          child: buildLoadingWidget(),
+                        );
+                      }
 
-                  final url = snapshot.data;
-                  if (url == null || url.isEmpty) {
-                    return buildErrorWidget();
-                  }
+                      if (snapshot.hasError) {
+                        logger.e('Image load failed: ${snapshot.error}');
+                        return buildErrorWidget();
+                      }
 
-                  return smartImage(url);
-                },
-              ),
+                      final url = snapshot.data;
+                      if (url == null || url.isEmpty) {
+                        return buildErrorWidget();
+                      }
+
+                      return smartImage(url);
+                    },
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -482,6 +498,10 @@ class HistoryPageState extends State<HistoryPage> {
   );
 
   Widget smartImage(String url) {
+    if (url.isEmpty) {
+      return buildErrorWidget();
+    }
+
     if (url.startsWith('assets')) {
       return Image.asset(
         url,
@@ -495,7 +515,17 @@ class HistoryPageState extends State<HistoryPage> {
         placeholder: (_, __) => buildLoadingWidget(),
         errorWidget: (_, url, error) => buildErrorWidget(),
         maxWidthDiskCache: kIsWeb ? null : 1024,
-        fadeInDuration: const Duration(milliseconds: 200),
+        memCacheWidth: 1024,
+        fadeInDuration: kIsWeb ? Duration.zero : const Duration(milliseconds: 200),
+        imageBuilder: kIsWeb
+            ? (context, imageProvider) {
+          return Image(
+            image: imageProvider,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => buildErrorWidget(),
+          );
+        }
+            : null,
       );
     }
   }

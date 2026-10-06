@@ -50,6 +50,7 @@ class _HomePageState extends State<HomePage> {
             child: Image.asset(
               homeState.backgroundImage,
               fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => buildErrorWidget(),
             ),
           ),
 
@@ -404,21 +405,41 @@ class _HomePageState extends State<HomePage> {
   );
 
   Widget smartImage(String url) {
-    if (url.startsWith('assets')) {
+    final trimmedUrl = url.trim();
+    if (trimmedUrl.isEmpty) {
+      return buildErrorWidget();
+    }
+
+    if (trimmedUrl.startsWith('assets/')) {
       return Image.asset(
-        url,
+        trimmedUrl,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => buildErrorWidget(),
+        errorBuilder: (_, error, stackTrace) {
+          logger.e('Asset image failed to load: $trimmedUrl, $error, $stackTrace');
+          return buildErrorWidget();
+        },
       );
     } else {
       return CachedNetworkImage(
-        imageUrl: url,
+        imageUrl: trimmedUrl,
         fit: BoxFit.cover,
         placeholder: (_, __) => buildLoadingWidget(),
-        errorWidget: (_, url, error) => buildErrorWidget(),
+        errorWidget: (context, url, error) {
+          logger.e('Network image failed to load: $url, $error');
+          return buildErrorWidget();
+        },
+        imageBuilder: kIsWeb
+            ? (context, imageProvider) => Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: imageProvider,
+              fit: BoxFit.cover,
+            ),
+          ),
+        )
+            : null,
         maxWidthDiskCache: kIsWeb ? null : 1024,
         fadeInDuration: const Duration(milliseconds: 200),
-        imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
       );
     }
   }
