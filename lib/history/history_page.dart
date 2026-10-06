@@ -10,7 +10,6 @@ import '../firebase/fire_store.dart';
 import '../footer/app_footer.dart';
 import '../refreshable/refreshable_page.dart';
 import '../utils/util.dart';
-import '../utils/logger_util.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -58,10 +57,8 @@ class HistoryPageState extends State<HistoryPage> {
     }
 
     setState(() {
-      // 获取所有雪季并按时间排序(最新的在前)
       _availableSeasons = seasonMap.keys.toList()
         ..sort((a, b) => _parseSeason(b).compareTo(_parseSeason(a)));
-      // 保存每个雪季的事件列表
       _seasonalEvents = _availableSeasons.map((s) => seasonMap[s]!).toList();
       if (_availableSeasons.isNotEmpty) {
         _currentSeasonIndex = 0;
@@ -81,9 +78,7 @@ class HistoryPageState extends State<HistoryPage> {
         final year = parts[2];
         return DateTime(int.parse(year), month, int.parse(day));
       }
-    } catch (e) {
-      logger.e('Error parsing date: $dateStr\n$e');
-    }
+    } catch (_) {}
     return DateTime.now();
   }
 
@@ -111,10 +106,9 @@ class HistoryPageState extends State<HistoryPage> {
 
     if (month >= 10) {
       return '${year.toString().substring(2)}/${(year + 1).toString().substring(2)}';
-    } else if (month <= 5) {
+    } else {
       return '${(year - 1).toString().substring(2)}/${year.toString().substring(2)}';
     }
-    return '${(year - 1).toString().substring(2)}/${year.toString().substring(2)}';
   }
 
   DateTime _parseSeason(String season) {
@@ -147,11 +141,13 @@ class HistoryPageState extends State<HistoryPage> {
   }
 
   void _scrollToTop() {
-    _scrollController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
@@ -317,54 +313,52 @@ class HistoryPageState extends State<HistoryPage> {
   Widget buildDesktopImageContent(EventHive event) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {},
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
-                blurRadius: 15,
-                offset: const Offset(0, 10),
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: AspectRatio(
-              aspectRatio: 3 / 4,
-              child: FutureBuilder<String?>(
-                future: Firestore.loadImageUrl(event.imageWeb),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return AnimatedOpacity(
-                      opacity: 0.5,
-                      duration: const Duration(milliseconds: 300),
-                      child: buildLoadingWidget(),
-                    );
-                  }
-
-                  if (snapshot.hasError) {
-                    logger.e('Image load failed: ${snapshot.error}');
-                    return buildErrorWidget();
-                  }
-
-                  final url = snapshot.data;
-                  if (url == null || url.isEmpty) {
-                    return buildErrorWidget();
-                  }
-
-                  return smartImage(url);
-                },
-              ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 10),
             ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth <= 0 || constraints.maxHeight <= 0) {
+                return buildLoadingWidget();
+              }
+
+              return AspectRatio(
+                aspectRatio: 3 / 4,
+                child: FutureBuilder<String?>(
+                  future: Firestore.loadImageUrl(event.imageWeb),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return AnimatedOpacity(
+                        opacity: 0.5,
+                        duration: const Duration(milliseconds: 300),
+                        child: buildLoadingWidget(),
+                      );
+                    }
+
+                    if (snapshot.hasError || snapshot.data == null || snapshot.data!.trim().isEmpty) {
+                      return buildErrorWidget();
+                    }
+
+                    return smartImage(snapshot.data!.trim());
+                  },
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -384,54 +378,52 @@ class HistoryPageState extends State<HistoryPage> {
   Widget buildMobileImageContent(EventHive event) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {},
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
-                blurRadius: 15,
-                offset: const Offset(0, 10),
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: AspectRatio(
-              aspectRatio: 4 / 3,
-              child: FutureBuilder<String?>(
-                future: Firestore.loadImageUrl(event.imageMobile),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return AnimatedOpacity(
-                      opacity: 0.5,
-                      duration: const Duration(milliseconds: 300),
-                      child: buildLoadingWidget(),
-                    );
-                  }
-
-                  if (snapshot.hasError) {
-                    logger.e('Image load failed: ${snapshot.error}');
-                    return buildErrorWidget();
-                  }
-
-                  final url = snapshot.data;
-                  if (url == null || url.isEmpty) {
-                    return buildErrorWidget();
-                  }
-
-                  return smartImage(url);
-                },
-              ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 10),
             ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth <= 0 || constraints.maxHeight <= 0) {
+                return buildLoadingWidget();
+              }
+
+              return AspectRatio(
+                aspectRatio: 4 / 3,
+                child: FutureBuilder<String?>(
+                  future: Firestore.loadImageUrl(event.imageMobile),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return AnimatedOpacity(
+                        opacity: 0.5,
+                        duration: const Duration(milliseconds: 300),
+                        child: buildLoadingWidget(),
+                      );
+                    }
+
+                    if (snapshot.hasError || snapshot.data == null || snapshot.data!.trim().isEmpty) {
+                      return buildErrorWidget();
+                    }
+
+                    return smartImage(snapshot.data!.trim());
+                  },
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -482,20 +474,36 @@ class HistoryPageState extends State<HistoryPage> {
   );
 
   Widget smartImage(String url) {
-    if (url.startsWith('assets')) {
+    final cleanUrl = url.trim();
+
+    if (cleanUrl.isEmpty) {
+      return buildErrorWidget();
+    }
+
+    if (cleanUrl.startsWith('assets')) {
       return Image.asset(
-        url,
+        cleanUrl,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) => buildErrorWidget(),
       );
     } else {
       return CachedNetworkImage(
-        imageUrl: url,
+        imageUrl: cleanUrl,
         fit: BoxFit.cover,
         placeholder: (_, __) => buildLoadingWidget(),
-        errorWidget: (_, url, error) => buildErrorWidget(),
+        errorWidget: (_, __, ___) => buildErrorWidget(),
         maxWidthDiskCache: kIsWeb ? null : 1024,
-        fadeInDuration: const Duration(milliseconds: 200),
+        memCacheWidth: kIsWeb ? null : 1024,
+        fadeInDuration: kIsWeb ? Duration.zero : const Duration(milliseconds: 200),
+        imageBuilder: kIsWeb
+            ? (context, imageProvider) {
+          return Image(
+            image: imageProvider,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => buildErrorWidget(),
+          );
+        }
+            : null,
       );
     }
   }

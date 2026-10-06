@@ -11,31 +11,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 设置 Flutter 环境
+      # 设置 Flutter 环境 (WASM 需要 Flutter 3.22+)
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 'any'  # 使用你项目实际的Flutter版本
+          flutter-version: '3.22.x'
 
-      # 缓存依赖
+      # 缓存依赖 (仅缓存 pub-cache，不缓存 build/web 产物)
       - name: Cache Flutter dependencies
         uses: actions/cache@v3
         with:
-          path: |
-            ~/.pub-cache
-            build/web
+          path: ~/.pub-cache
           key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
 
       # 安装依赖
       - name: Install dependencies
         run: |
           flutter pub get
-          npm install  # 如果同时使用npm依赖
+          npm install
 
-      # 构建项目
-      - name: Build Flutter Web
-        run: flutter build web --release
+      # 构建项目 (启用 WASM 编译模式)
+      - name: Build Flutter Web (WASM)
+        run: flutter build web --wasm --release
 
       # 部署预览环境
       - uses: FirebaseExtended/action-hosting-deploy@v0
@@ -43,5 +41,5 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_N47WEB }}
           projectId: n47web
-          expires: 7d  # 预览链接7天后过期
+          expires: 7d
           message: "PR Preview: ${{ github.event.pull_request.title }}"

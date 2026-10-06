@@ -12,7 +12,6 @@ import '../footer/app_footer.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../refreshable/refreshable_page.dart';
 import '../utils/util.dart';
-import '../utils/logger_util.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -50,9 +49,9 @@ class _HomePageState extends State<HomePage> {
             child: Image.asset(
               homeState.backgroundImage,
               fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => buildErrorWidget(),
             ),
           ),
-
           if (_backgroundLoaded) ...[
             const AppHeader(),
             Positioned(
@@ -273,17 +272,11 @@ class _HomePageState extends State<HomePage> {
                     );
                   }
 
-                  if (snapshot.hasError) {
-                    logger.e('Image load failed: ${snapshot.error}');
+                  if (snapshot.hasError || snapshot.data == null || snapshot.data!.trim().isEmpty) {
                     return buildErrorWidget();
                   }
 
-                  final url = snapshot.data;
-                  if (url == null || url.isEmpty) {
-                    return buildErrorWidget();
-                  }
-
-                  return smartImage(url);
+                  return smartImage(snapshot.data!.trim());
                 },
               ),
             ),
@@ -328,7 +321,7 @@ class _HomePageState extends State<HomePage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: AspectRatio(
-              aspectRatio: 4 / 3, // image ratio
+              aspectRatio: 4 / 3,
               child: FutureBuilder<String?>(
                 future: Firestore.loadImageUrl(event.imageMobile),
                 builder: (context, snapshot) {
@@ -340,17 +333,11 @@ class _HomePageState extends State<HomePage> {
                     );
                   }
 
-                  if (snapshot.hasError) {
-                    logger.e('Image load failed: ${snapshot.error}');
+                  if (snapshot.hasError || snapshot.data == null || snapshot.data!.trim().isEmpty) {
                     return buildErrorWidget();
                   }
 
-                  final url = snapshot.data;
-                  if (url == null || url.isEmpty) {
-                    return buildErrorWidget();
-                  }
-
-                  return smartImage(url);
+                  return smartImage(snapshot.data!.trim());
                 },
               ),
             ),
@@ -365,7 +352,7 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
       child: Column(
         crossAxisAlignment: alignLeft ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min, // Avoid Infinite Scaling
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             Util.formatHtmlText(event.dateText),
@@ -404,21 +391,38 @@ class _HomePageState extends State<HomePage> {
   );
 
   Widget smartImage(String url) {
-    if (url.startsWith('assets')) {
+    final trimmedUrl = url.trim();
+    if (trimmedUrl.isEmpty) {
+      return buildErrorWidget();
+    }
+
+    final isAsset = trimmedUrl.startsWith('assets') || trimmedUrl.startsWith('/assets');
+    final cleanAssetPath = trimmedUrl.startsWith('/') ? trimmedUrl.substring(1) : trimmedUrl;
+
+    if (isAsset) {
       return Image.asset(
-        url,
+        cleanAssetPath,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) => buildErrorWidget(),
       );
     } else {
       return CachedNetworkImage(
-        imageUrl: url,
+        imageUrl: trimmedUrl,
         fit: BoxFit.cover,
         placeholder: (_, __) => buildLoadingWidget(),
-        errorWidget: (_, url, error) => buildErrorWidget(),
+        errorWidget: (_, __, ___) => buildErrorWidget(),
+        imageBuilder: kIsWeb
+            ? (context, imageProvider) => Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: imageProvider,
+              fit: BoxFit.cover,
+            ),
+          ),
+        )
+            : null,
         maxWidthDiskCache: kIsWeb ? null : 1024,
         fadeInDuration: const Duration(milliseconds: 200),
-        imageBuilder: kIsWeb ? (context, imageProvider) => Image(image: imageProvider) : null,
       );
     }
   }
