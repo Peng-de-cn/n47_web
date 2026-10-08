@@ -96,6 +96,10 @@
       visibility: hidden;
     }
   </style>
+
+  <!-- Flutter 动态构建注入配置 (适用于 WASM / JS) -->
+  {{flutter_js}}
+  {{flutter_build_config}}
 </head>
 <body>
 
@@ -138,12 +142,12 @@
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  // 3. 兜底保护：3 秒后强行关闭 Splash
-  setTimeout(hideSplash, 3000);
+  // 3. 兜底保护：4 秒后强行关闭 Splash
+  setTimeout(hideSplash, 4000);
 </script>
 
-<!-- 💡 直接加载编译好的纯静态 main.dart.js，彻底规避生成的 bootstrap 脚本 Bug -->
-<script src="main.dart.js" type="application/javascript"></script>
+<!-- Flutter 3.22+ 标准 Bootstrap 入口（由引擎自动处理 WASM 和 JS 转换） -->
+<script src="flutter_bootstrap.js" async></script>
 
 </body>
 </html>

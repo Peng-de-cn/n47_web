@@ -3,37 +3,36 @@ on:
   push:
     branches:
       - master
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      # 设置 Flutter 环境
+
+      # 设置 Flutter 环境 (WASM 需要 Flutter 3.22+)
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable  # 使用稳定版
-          flutter-version: 'any'  # 指定你的Flutter版本
-      
-      # 缓存依赖
+          channel: stable
+          flutter-version: '3.22.x' # 或指定 'any'，确保 stable 为 3.22+
+
+      # 缓存依赖 (只缓存 pub 依赖，不缓存 build/web)
       - name: Cache Flutter dependencies
         uses: actions/cache@v3
         with:
-          path: |
-            ~/.pub-cache
-            build/web
+          path: ~/.pub-cache
           key: ${{ runner.os }}-flutter-${{ hashFiles('pubspec.lock') }}
-      
+
       # 安装依赖
       - name: Install dependencies
         run: flutter pub get
-      
-      # 构建项目
-      - name: Build Flutter Web
-        run: flutter build web --release
-      
-      # 部署到Firebase
+
+      # 构建项目 (启用 WASM 编译模式)
+      - name: Build Flutter Web (WASM)
+        run: flutter build web --wasm --release
+
+      # 部署到 Firebase
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}

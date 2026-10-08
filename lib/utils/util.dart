@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 
 class Util {
 
@@ -16,7 +16,7 @@ class Util {
 
   static bool isSafariBrowser() {
     if (!kIsWeb) return false;
-    final userAgent = html.window.navigator.userAgent.toLowerCase();
+    final userAgent = web.window.navigator.userAgent.toLowerCase();
     return userAgent.contains('safari') &&
         !userAgent.contains('chrome') &&
         !userAgent.contains('chromium');

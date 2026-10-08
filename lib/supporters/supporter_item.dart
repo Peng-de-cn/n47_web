@@ -1,11 +1,9 @@
 
-import 'dart:io';
-
+import 'package:web/web.dart' as web;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../utils/logger_util.dart';
-import 'dart:html' as html;
 
 class SupporterItem extends StatelessWidget {
   final String imagePath;
@@ -63,13 +61,13 @@ class SupporterItem extends StatelessWidget {
     try {
       if (kIsWeb) {
         // Web 环境
-        final userAgent = html.window.navigator.userAgent.toLowerCase();
+        final userAgent = web.window.navigator.userAgent.toLowerCase();
         final isIosSafari = userAgent.contains('iphone') ||
             userAgent.contains('ipad') ||
             (userAgent.contains('safari') && !userAgent.contains('chrome'));
 
         if (isIosSafari) {
-          html.window.location.href = url;
+          web.window.location.href = url;
         } else {
           await _launchWithUrlLauncher();
         }
