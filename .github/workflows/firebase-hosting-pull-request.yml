@@ -16,7 +16,6 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: '3.22.x'
 
       # 缓存依赖 (仅缓存 pub-cache，不缓存 build/web 产物)
       - name: Cache Flutter dependencies
