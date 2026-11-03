@@ -22,7 +22,7 @@ class HistoryPageState extends State<HistoryPage> {
   final ScrollController _scrollController = ScrollController();
   int _currentSeasonIndex = 0;
   List<String> _availableSeasons = [];
-  List<List<EventHive>> _seasonalEvents = [];
+  List<List<HistoryEventHive>> _seasonalEvents = [];
   final List<Color> _alternateColors = [
     const Color(0xFFF5F5F5),
     const Color(0xFFEDEDED),
@@ -47,8 +47,8 @@ class HistoryPageState extends State<HistoryPage> {
     _processEvents(cubit.state);
   }
 
-  void _processEvents(List<EventHive> events) {
-    final seasonMap = <String, List<EventHive>>{};
+  void _processEvents(List<HistoryEventHive> events) {
+    final seasonMap = <String, List<HistoryEventHive>>{};
 
     for (final event in events) {
       final date = _parseDate(event.date);
@@ -117,7 +117,7 @@ class HistoryPageState extends State<HistoryPage> {
     return DateTime(startYear, 10);
   }
 
-  List<EventHive> _getEventsForCurrentSeason() {
+  List<HistoryEventHive> _getEventsForCurrentSeason() {
     if (_availableSeasons.isEmpty) return [];
     return _seasonalEvents[_currentSeasonIndex];
   }
@@ -205,7 +205,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildContent(List<EventHive> events, BuildContext context) {
+  Widget buildContent(List<HistoryEventHive> events, BuildContext context) {
     return CustomScrollView(
       controller: _scrollController,
       slivers: [
@@ -233,7 +233,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildDesktopLayout(int index, EventHive event) {
+  Widget buildDesktopLayout(int index, HistoryEventHive event) {
     return Container(
       color: _alternateColors[index % 2],
       padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 30.0),
@@ -272,7 +272,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildDesktopTextContent(EventHive event) {
+  Widget buildDesktopTextContent(HistoryEventHive event) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Align(
@@ -310,7 +310,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildDesktopImageContent(EventHive event) {
+  Widget buildDesktopImageContent(HistoryEventHive event) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Container(
@@ -365,7 +365,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildMobileLayout(int index, EventHive event, int eventsLength) {
+  Widget buildMobileLayout(int index, HistoryEventHive event, int eventsLength) {
     return Column(
       children: [
         buildMobileImageContent(event),
@@ -375,7 +375,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildMobileImageContent(EventHive event) {
+  Widget buildMobileImageContent(HistoryEventHive event) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
       child: Container(
@@ -430,7 +430,7 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget buildMobileTextContent(EventHive event, bool alignLeft) {
+  Widget buildMobileTextContent(HistoryEventHive event, bool alignLeft) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
       child: Column(

@@ -4,7 +4,7 @@ import '../database/event_repository.dart';
 import '../firebase/fire_store.dart';
 import '../utils/logger_util.dart';
 
-class HistoryEventsCubit extends Cubit<List<EventHive>> {
+class HistoryEventsCubit extends Cubit<List<HistoryEventHive>> {
 
   HistoryEventsCubit() : super([]);
 

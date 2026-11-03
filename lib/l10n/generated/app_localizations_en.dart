@@ -12,6 +12,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Be Prepared For The Alpine And Beyond!';
 
   @override
+  String get tableHeaderDate => 'DATE';
+
+  @override
+  String get tableHeaderEventLocation => 'EVENT / LOCATION';
+
+  @override
+  String get tableHeaderBrands => 'BRANDS';
+
+  @override
   String get naviHistory => 'History';
 
   @override

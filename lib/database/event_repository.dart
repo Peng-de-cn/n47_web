@@ -16,29 +16,42 @@ class EventRepository {
   static Future<void> init() async {
     await Hive.initFlutter();
 
-    // 1. 注册 Hive CE 生成的 EventHiveAdapter
-    Hive.registerAdapter(EventHiveAdapter());
+    // 1. 注册 Hive CE 生成的 FutureEventHiveAdapter 和 HistoryEventHiveAdapter
+    Hive.registerAdapter(FutureEventHiveAdapter());
+    Hive.registerAdapter(HistoryEventHiveAdapter());
 
     // 2. 打开指定强类型的 Box
-    await Hive.openBox<EventHive>(_historyEventsBox);
-    await Hive.openBox<EventHive>(_futureEventsBox);
+    await Hive.openBox<HistoryEventHive>(_historyEventsBox);
+    await Hive.openBox<FutureEventHive>(_futureEventsBox);
     await Hive.openBox(_futureHashKeyBox);
     await Hive.openBox(_historyHashKeyBox);
   }
 
   static Future<void> importFutureEvents(List<Map<String, dynamic>> futureEvents) async {
-    // 使用 EventDto.fromJson 解析 JSON，并转换为 EventHive 存储对象
     final events = futureEvents
-        .map((data) => EventDto.fromJson(data).toHive())
+        .map((data) => FutureEventDto.fromJson(data).toHive())
         .toList();
 
-    final eventsBox = Hive.box<EventHive>(_futureEventsBox);
+    final eventsBox = Hive.box<FutureEventHive>(_futureEventsBox);
     final keyBox = Hive.box(_futureHashKeyBox);
 
-    final newHash = _calculateListHash(events);
+    final newHash = _calculateFutureListHash(events);
     final lastHash = keyBox.get(_futureEventsHashKey, defaultValue: -1);
-    if (lastHash == newHash) {
-      logger.d("same json, don´t import");
+
+    bool boxValid = true;
+    try {
+      for (final dynamic val in eventsBox.values.cast<dynamic>()) {
+        if (val is! FutureEventHive) {
+          boxValid = false;
+          break;
+        }
+      }
+    } catch (_) {
+      boxValid = false;
+    }
+
+    if (lastHash == newHash && boxValid && eventsBox.isNotEmpty) {
+      logger.d("same json, don´t import future");
       return;
     }
 
@@ -47,25 +60,42 @@ class EventRepository {
     await keyBox.put(_futureEventsHashKey, newHash);
   }
 
-  static List<EventHive> getFutureEventsSortedByDate() {
-    return Hive.box<EventHive>(_futureEventsBox)
-        .values
-        .toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
+  static List<FutureEventHive> getFutureEventsSortedByDate() {
+    try {
+      final eventsBox = Hive.box<FutureEventHive>(_futureEventsBox);
+      return eventsBox.values.toList()
+        ..sort((a, b) => a.date.compareTo(b.date));
+    } catch (e) {
+      logger.e('Failed to read future events from Hive: $e');
+      return [];
+    }
   }
 
   static Future<void> importHistoryEvents(List<Map<String, dynamic>> historyEvents) async {
     final events = historyEvents
-        .map((data) => EventDto.fromJson(data).toHive())
+        .map((data) => HistoryEventDto.fromJson(data).toHive())
         .toList();
 
-    final eventsBox = Hive.box<EventHive>(_historyEventsBox);
+    final eventsBox = Hive.box<HistoryEventHive>(_historyEventsBox);
     final keyBox = Hive.box(_historyHashKeyBox);
 
-    final newHash = _calculateListHash(events);
+    final newHash = _calculateHistoryListHash(events);
     final lastHash = keyBox.get(_historyEventsHashKey, defaultValue: -1);
-    if (lastHash == newHash) {
-      logger.d("same json, don´t import");
+
+    bool boxValid = true;
+    try {
+      for (final dynamic val in eventsBox.values.cast<dynamic>()) {
+        if (val is! HistoryEventHive) {
+          boxValid = false;
+          break;
+        }
+      }
+    } catch (_) {
+      boxValid = false;
+    }
+
+    if (lastHash == newHash && boxValid && eventsBox.isNotEmpty) {
+      logger.d("same json, don´t import history");
       return;
     }
 
@@ -74,15 +104,26 @@ class EventRepository {
     await keyBox.put(_historyEventsHashKey, newHash);
   }
 
-  static List<EventHive> getHistoryEventsSortedByDate() {
-    return Hive.box<EventHive>(_historyEventsBox)
-        .values
-        .toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
+  static List<HistoryEventHive> getHistoryEventsSortedByDate() {
+    try {
+      final eventsBox = Hive.box<HistoryEventHive>(_historyEventsBox);
+      return eventsBox.values.toList()
+        ..sort((a, b) => b.date.compareTo(a.date));
+    } catch (e) {
+      logger.e('Failed to read history events from Hive: $e');
+      return [];
+    }
   }
 }
 
-int _calculateListHash(List<EventHive> events) {
+int _calculateFutureListHash(List<FutureEventHive> events) {
+  return events.fold(0, (hash, event) {
+    final eventJson = event.toDto().toJson();
+    return hash ^ jsonEncode(eventJson).hashCode;
+  });
+}
+
+int _calculateHistoryListHash(List<HistoryEventHive> events) {
   return events.fold(0, (hash, event) {
     final eventJson = event.toDto().toJson();
     return hash ^ jsonEncode(eventJson).hashCode;

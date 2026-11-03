@@ -4,7 +4,81 @@ import 'package:hive_ce/hive.dart';
 part 'event.g.dart';
 
 @JsonSerializable()
-class EventDto {
+class FutureEventDto {
+  final String id;
+  final String title;
+  final String date;
+  final String dateText;
+  final String location;
+  final String brand;
+
+  FutureEventDto({
+    this.id = '',
+    this.title = '',
+    this.date = '',
+    this.dateText = '',
+    this.location = '',
+    this.brand = '',
+  });
+
+  factory FutureEventDto.fromJson(Map<String, dynamic> json) => _$FutureEventDtoFromJson(json);
+  Map<String, dynamic> toJson() => _$FutureEventDtoToJson(this);
+
+  FutureEventHive toHive() {
+    return FutureEventHive(
+      id: id,
+      title: title,
+      date: date,
+      dateText: dateText,
+      location: location,
+      brand: brand,
+    );
+  }
+}
+
+@HiveType(typeId: 0)
+class FutureEventHive {
+  @HiveField(0)
+  final String id;
+
+  @HiveField(1)
+  final String title;
+
+  @HiveField(2)
+  final String date;
+
+  @HiveField(3)
+  final String dateText;
+
+  @HiveField(4)
+  final String location;
+
+  @HiveField(5)
+  final String brand;
+
+  FutureEventHive({
+    this.id = '',
+    this.title = '',
+    this.date = '',
+    this.dateText = '',
+    this.location = '',
+    this.brand = '',
+  });
+
+  FutureEventDto toDto() {
+    return FutureEventDto(
+      id: id,
+      title: title,
+      date: date,
+      dateText: dateText,
+      location: location,
+      brand: brand,
+    );
+  }
+}
+
+@JsonSerializable()
+class HistoryEventDto {
   final String id;
   final String title;
   final String date;
@@ -13,7 +87,7 @@ class EventDto {
   final String imageWeb;
   final String imageMobile;
 
-  EventDto({
+  HistoryEventDto({
     this.id = '',
     this.title = '',
     this.date = '',
@@ -23,11 +97,11 @@ class EventDto {
     this.imageMobile = '',
   });
 
-  factory EventDto.fromJson(Map<String, dynamic> json) => _$EventDtoFromJson(json);
-  Map<String, dynamic> toJson() => _$EventDtoToJson(this);
+  factory HistoryEventDto.fromJson(Map<String, dynamic> json) => _$HistoryEventDtoFromJson(json);
+  Map<String, dynamic> toJson() => _$HistoryEventDtoToJson(this);
 
-  EventHive toHive() {
-    return EventHive(
+  HistoryEventHive toHive() {
+    return HistoryEventHive(
       id: id,
       title: title,
       date: date,
@@ -39,8 +113,8 @@ class EventDto {
   }
 }
 
-@HiveType(typeId: 0)
-class EventHive {
+@HiveType(typeId: 1)
+class HistoryEventHive {
   @HiveField(0)
   final String id;
 
@@ -62,7 +136,7 @@ class EventHive {
   @HiveField(6)
   final String imageMobile;
 
-  EventHive({
+  HistoryEventHive({
     this.id = '',
     this.title = '',
     this.date = '',
@@ -72,8 +146,8 @@ class EventHive {
     this.imageMobile = '',
   });
 
-  EventDto toDto() {
-    return EventDto(
+  HistoryEventDto toDto() {
+    return HistoryEventDto(
       id: id,
       title: title,
       date: date,

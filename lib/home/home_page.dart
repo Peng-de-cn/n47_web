@@ -1,8 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:n47_web/firebase/fire_store.dart';
 import 'package:n47_web/header/app_header.dart';
 import 'package:n47_web/home/home_bloc.dart';
 import 'package:n47_web/home/scrolldown_indicator.dart';
@@ -67,7 +64,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildContent(BuildContext context, List<EventHive> events) {
+  Widget buildContent(BuildContext context, List<FutureEventHive> events) {
     final isMobile = Util.isMobile(context);
     final scrollController = ScrollController();
     final mediaQuery = MediaQuery.of(context);
@@ -123,307 +120,200 @@ class _HomePageState extends State<HomePage> {
             ),
           )
         else
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                final event = events[index];
-                return Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: const Alignment(0.0, -1.0),
-                      end: const Alignment(0.0, 0.5),
-                      colors: [
-                        Colors.white.withValues(alpha: 0.6),
-                        Colors.white.withValues(alpha: 0.7),
-                        Colors.white.withValues(alpha: 0.8),
-                        Colors.white.withValues(alpha: 0.9),
-                        Colors.white,
-                      ],
-                      stops: const [0.6, 0.7, 0.8, 0.9, 1.0],
+          SliverToBoxAdapter(
+            child: Container(
+              color: Colors.white.withValues(alpha: 0.92),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 20.0 : 80.0,
+                vertical: 40.0,
+              ),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1200),
+                child: Column(
+                  children: [
+                    if (!isMobile) ...[
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 180,
+                            child: Text(
+                              AppLocalizations.of(context)!.tableHeaderDate,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              AppLocalizations.of(context)!.tableHeaderEventLocation,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 120,
+                            child: Text(
+                              AppLocalizations.of(context)!.tableHeaderBrands,
+                              textAlign: TextAlign.right,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 30, thickness: 1.5, color: Colors.black87),
+                    ],
+
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: events.length,
+                      separatorBuilder: (context, index) => const Divider(height: 32, thickness: 0.8, color: Colors.black12),
+                      itemBuilder: (context, index) {
+                        final event = events[index];
+                        return isMobile
+                            ? buildMobileEventRow(event)
+                            : buildDesktopEventRow(event);
+                      },
                     ),
-                  ),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return constraints.maxWidth > 600
-                          ? buildDesktopLayout(index, event)
-                          : buildMobileLayout(index, event, events.length);
-                    },
-                  ),
-                );
-              },
-              childCount: events.length,
+                    const SizedBox(height: 50),
+                  ],
+                ),
+              ),
             ),
           ),
+
         const SliverToBoxAdapter(child: AppFooter()),
       ],
     );
   }
 
-  Widget buildDesktopLayout(int index, EventHive event) {
+  Widget buildDesktopEventRow(FutureEventHive event) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 20.0),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final textWidth = constraints.maxWidth * 0.7;
-          final imageWidth = constraints.maxWidth * 0.3;
-
-          return index % 2 == 0
-              ? Row(
-            children: [
-              SizedBox(
-                width: textWidth,
-                child: buildDesktopTextContent(event),
-              ),
-              SizedBox(
-                width: imageWidth,
-                child: buildDesktopImageContent(event),
-              ),
-            ],
-          )
-              : Row(
-            children: [
-              SizedBox(
-                width: imageWidth,
-                child: buildDesktopImageContent(event),
-              ),
-              SizedBox(
-                width: textWidth,
-                child: buildDesktopTextContent(event),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget buildDesktopTextContent(EventHive event) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 180,
+            child: Text(
               Util.formatHtmlText(event.dateText),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              Util.formatHtmlText(event.title),
-              style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              Util.formatHtmlText(event.description),
               style: const TextStyle(
                 fontSize: 18,
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildDesktopImageContent(EventHive event) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {},
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
-                blurRadius: 15,
-                offset: const Offset(0, 10),
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: AspectRatio(
-              aspectRatio: 3 / 4,
-              child: FutureBuilder<String?>(
-                future: Firestore.loadImageUrl(event.imageWeb),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return AnimatedOpacity(
-                      opacity: 0.5,
-                      duration: const Duration(milliseconds: 300),
-                      child: buildLoadingWidget(),
-                    );
-                  }
-
-                  if (snapshot.hasError || snapshot.data == null || snapshot.data!.trim().isEmpty) {
-                    return buildErrorWidget();
-                  }
-
-                  return smartImage(snapshot.data!.trim());
-                },
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildMobileLayout(int index, EventHive event, int eventsLength) {
-    return Column(
-      children: [
-        buildMobileImageContent(event),
-        buildMobileTextContent(event, true),
-        if (index != eventsLength - 1) const Divider(height: 40),
-      ],
-    );
-  }
-
-  Widget buildMobileImageContent(EventHive event) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {},
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
-                blurRadius: 15,
-                offset: const Offset(0, 10),
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  Util.formatHtmlText(event.title),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                if (event.location.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    Util.formatHtmlText(event.location),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: AspectRatio(
-              aspectRatio: 4 / 3,
-              child: FutureBuilder<String?>(
-                future: Firestore.loadImageUrl(event.imageMobile),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return AnimatedOpacity(
-                      opacity: 0.5,
-                      duration: const Duration(milliseconds: 300),
-                      child: buildLoadingWidget(),
-                    );
-                  }
-
-                  if (snapshot.hasError || snapshot.data == null || snapshot.data!.trim().isEmpty) {
-                    return buildErrorWidget();
-                  }
-
-                  return smartImage(snapshot.data!.trim());
-                },
+          if (event.brand.isNotEmpty)
+            SizedBox(
+              width: 120,
+              child: Text(
+                event.brand,
+                textAlign: TextAlign.right,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.0,
+                  color: Colors.black54,
+                ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildMobileTextContent(EventHive event, bool alignLeft) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
-      child: Column(
-        crossAxisAlignment: alignLeft ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            Util.formatHtmlText(event.dateText),
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[700],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            Util.formatHtmlText(event.title),
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            Util.formatHtmlText(event.description),
-            style: const TextStyle(
-              fontSize: 16,
-              height: 1.5,
-            ),
-          ),
         ],
       ),
     );
   }
 
-  Widget buildLoadingWidget() => const Center(child: CircularProgressIndicator());
+  /// 手机端响应式行设计
+  Widget buildMobileEventRow(FutureEventHive event) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              Util.formatHtmlText(event.dateText),
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[700],
+              ),
+            ),
+            if (event.brand.isNotEmpty)
+              Text(
+                event.brand,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.8,
+                  color: Colors.black54,
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          Util.formatHtmlText(event.title),
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        if (event.location.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            Util.formatHtmlText(event.location),
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[700],
+              height: 1.4,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
 
   Widget buildErrorWidget() => Container(
     color: Colors.grey[200],
     child: const Icon(Icons.broken_image),
   );
-
-  Widget smartImage(String url) {
-    final trimmedUrl = url.trim();
-    if (trimmedUrl.isEmpty) {
-      return buildErrorWidget();
-    }
-
-    final isAsset = trimmedUrl.startsWith('assets') || trimmedUrl.startsWith('/assets');
-    final cleanAssetPath = trimmedUrl.startsWith('/') ? trimmedUrl.substring(1) : trimmedUrl;
-
-    if (isAsset) {
-      return Image.asset(
-        cleanAssetPath,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => buildErrorWidget(),
-      );
-    } else {
-      return CachedNetworkImage(
-        imageUrl: trimmedUrl,
-        fit: BoxFit.cover,
-        placeholder: (_, __) => buildLoadingWidget(),
-        errorWidget: (_, __, ___) => buildErrorWidget(),
-        imageBuilder: kIsWeb
-            ? (context, imageProvider) => Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: imageProvider,
-              fit: BoxFit.cover,
-            ),
-          ),
-        )
-            : null,
-        maxWidthDiskCache: kIsWeb ? null : 1024,
-        fadeInDuration: const Duration(milliseconds: 200),
-      );
-    }
-  }
 }

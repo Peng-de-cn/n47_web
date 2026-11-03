@@ -1,6 +1,10 @@
 {
   "appTitle": "Be Prepared For The Alpine And Beyond!",
 
+  "tableHeaderDate": "DATE",
+  "tableHeaderEventLocation": "EVENT / LOCATION",
+  "tableHeaderBrands": "BRANDS",
+
   "naviHistory": "History",
   "naviSupporters": "Supporters",
   "naviContact": "Contact",

@@ -1,47 +1,106 @@
 [
   {
     "id": "1",
-    "title": "25-26 season opening",
-    "date": "2025-11-01",
-    "dateText": "01 November 2025",
-    "description": "We're excited to announce that we will organize a 25-26 ski season Opening Event at November 1st 2025 at ski resort Pitztal Gletscher, Austria.\n \nCome and join the raffles！Generous gifts are waiting for you!",
-    "imageWeb": "assets/images/future/web/Season_open.jpg",
-    "imageMobile": "assets/images/future/mobile/Season_open.jpg"
+    "title": "Season Opening Event",
+    "date": "2026-10-31",
+    "dateText": "31 Oct 2026",
+    "location": "Pitztal Glacier · Austria",
+    "brand": "NITRO / JONES"
   },
   {
     "id": "2",
-    "title": "N47 Snowboard Park Camp",
-    "date": "2025-11-15",
-    "dateText": "November 2025 - May 2026",
-    "description": "Join our freestyle training camp designed for all skill levels. Learn park basics, improve your tricks, and ride with our experienced coaches in a fun and friendly environment. Whether you're hitting your first rail or dialing in your spins, this camp is your next step in freestyle progression.",
-    "imageWeb": "assets/images/future/web/Snowboard_Park_Camp.jpg",
-    "imageMobile": "assets/images/future/mobile/Snowboard_Park_Camp.jpg"
+    "title": "Christmas Snowboard Carnival",
+    "date": "2026-12-24",
+    "dateText": "24–30 Dec 2026",
+    "location": "Lana · Italy",
+    "brand": "NITRO"
   },
   {
     "id": "3",
-    "title": "Christmas Ski Carnival",
-    "date": "2025-12-24",
-    "dateText": "20-28 December 2025",
-    "description": "Celebrate Christmas in the Dolomites with a week of skiing and snowboarding. Enjoy exclusive gifts and unforgettable memories.",
-    "imageWeb": "assets/images/future/web/Christmas.jpg",
-    "imageMobile": "assets/images/future/mobile/Christmas.jpg"
+    "title": "N47 Freeride Camp",
+    "date": "2027-01-15",
+    "dateText": "15–17 Jan 2027",
+    "location": "Stubaier Gletscher · Austria",
+    "brand": "JONES"
   },
   {
     "id": "4",
-    "title": "Nitro & N47 European Chinese Snowboard Park Challenge (Men & Women)",
-    "date": "2026-02-21",
-    "dateText": "21 February 2026",
-    "description": "The competition is scheduled to take place in ski resort Mayrhofen, Austria in February. Generous prizes sponsored by Nitro will be awarded to the participants.",
-    "imageWeb": "assets/images/future/web/Snowpark_challenge_2526.jpg",
-    "imageMobile": "assets/images/future/mobile/Snowpark_challenge_2526.jpg"
+    "title": "Snowboard Park Camp Series - Vol. 1",
+    "date": "2027-01-16",
+    "dateText": "16 Jan 2027",
+    "location": "Oberammergau · Germany",
+    "brand": "NITRO"
   },
   {
     "id": "5",
-    "title": "Nitro 26-27 New Snowboard Test Event",
-    "date": "2026-03-14",
-    "dateText": "14-15 March 2026",
-    "description": "Be the first to ride Nitro’s brand-new 26-27 snowboard lineup — for free! Join us this March for an exclusive on-snow test event, open to all riders. Try out the latest shapes, tech, and designs before anyone else.",
-    "imageWeb": "assets/images/future/web/Nitro_TestEvent.jpg",
-    "imageMobile": "assets/images/future/mobile/Nitro_TestEvent.jpg"
+    "title": "Youth Snowboard Camp",
+    "date": "2027-02-09",
+    "dateText": "09–12 Feb 2027",
+    "location": "Oberammergau · Germany",
+    "brand": "NITRO"
+  },
+  {
+    "id": "6",
+    "title": "Splitboard Touring Camp - Vol. 1",
+    "date": "2027-02-19",
+    "dateText": "19–21 Feb 2027",
+    "location": "Paznauntal · Austria",
+    "brand": "JONES"
+  },
+  {
+    "id": "7",
+    "title": "Snowboard Park Camp Series - Vol. 2",
+    "date": "2027-02-27",
+    "dateText": "27 Feb 2027 (Morning)",
+    "location": "Oberammergau · Germany",
+    "brand": "NITRO"
+  },
+  {
+    "id": "8",
+    "title": "European Chinese Snowboard Park Challenge",
+    "date": "2027-02-27",
+    "dateText": "27 Feb 2027",
+    "location": "Oberammergau · Germany",
+    "brand": "NITRO"
+  },
+  {
+    "id": "9",
+    "title": "27/28 Season Snowboard Test Day",
+    "date": "2027-03-06",
+    "dateText": "06 Mar 2027",
+    "location": "Ehrwalder Almbahn · Austria",
+    "brand": "JONES"
+  },
+  {
+    "id": "10",
+    "title": "Splitboard Touring Camp - Vol. 2",
+    "date": "2027-03-12",
+    "dateText": "12–14 Mar 2027",
+    "location": "Montafon · Austria",
+    "brand": "JONES"
+  },
+  {
+    "id": "11",
+    "title": "Good Times Camp",
+    "date": "2027-03-13",
+    "dateText": "13–14 Mar 2027",
+    "location": "Madonna di Campiglio · Italy",
+    "brand": "NITRO"
+  },
+  {
+    "id": "12",
+    "title": "27/28 New Snowboard Test Event",
+    "date": "2027-03-20",
+    "dateText": "20 Mar 2027",
+    "location": "Hochfügen · Austria",
+    "brand": "NITRO"
+  },
+  {
+    "id": "13",
+    "title": "Laax Snowboard Trip",
+    "date": "2027-03-25",
+    "dateText": "Mar 2027",
+    "location": "Laax · Switzerland",
+    "brand": "NITRO"
   }
 ]
