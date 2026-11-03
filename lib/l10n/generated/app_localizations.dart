@@ -100,6 +100,24 @@ abstract class AppLocalizations {
   /// **'Be Prepared For The Alpine And Beyond!'**
   String get appTitle;
 
+  /// No description provided for @tableHeaderDate.
+  ///
+  /// In en, this message translates to:
+  /// **'DATE'**
+  String get tableHeaderDate;
+
+  /// No description provided for @tableHeaderEventLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'EVENT / LOCATION'**
+  String get tableHeaderEventLocation;
+
+  /// No description provided for @tableHeaderBrands.
+  ///
+  /// In en, this message translates to:
+  /// **'BRANDS'**
+  String get tableHeaderBrands;
+
   /// No description provided for @naviHistory.
   ///
   /// In en, this message translates to:

@@ -7,12 +7,14 @@ import 'package:n47_web/database/event.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
-    registerAdapter(EventHiveAdapter());
+    registerAdapter(FutureEventHiveAdapter());
+    registerAdapter(HistoryEventHiveAdapter());
   }
 }
 
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
-    registerAdapter(EventHiveAdapter());
+    registerAdapter(FutureEventHiveAdapter());
+    registerAdapter(HistoryEventHiveAdapter());
   }
 }

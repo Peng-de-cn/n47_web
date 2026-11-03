@@ -1,0 +1,11 @@
+{
+  "name": "n47-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "update-events": "node update_events.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.6.0"
+  }
+}

@@ -16,24 +16,27 @@ class Firestore {
           .collection('future')
           .get();
 
-      return querySnapshot.docs.map((doc) {
-        return {
-          'id': doc.id,
-          ...doc.data(),
-        };
-      }).toList();
-    } catch (e) {
-      logger.e('load firestore error: $e');
-      try {
-        final jsonData = await rootBundle.loadString('assets/data/future.json');
-        final List<dynamic> decodedData = jsonDecode(jsonData);
-        return decodedData
-            .map((item) => item as Map<String, dynamic>)
-            .toList();
-      } catch (e) {
-        logger.e('load local data error: $e');
-        return [];
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.map((doc) {
+          return {
+            'id': doc.id,
+            ...doc.data(),
+          };
+        }).toList();
       }
+    } catch (e) {
+      logger.e('load firestore future error: $e');
+    }
+
+    try {
+      final jsonData = await rootBundle.loadString('assets/data/future.json');
+      final List<dynamic> decodedData = jsonDecode(jsonData);
+      return decodedData
+          .map((item) => item as Map<String, dynamic>)
+          .toList();
+    } catch (e) {
+      logger.e('load local future data error: $e');
+      return [];
     }
   }
 
@@ -45,24 +48,27 @@ class Firestore {
           .collection('history')
           .get();
 
-      return querySnapshot.docs.map((doc) {
-        return {
-          'id': doc.id,
-          ...doc.data(),
-        };
-      }).toList();
-    } catch (e) {
-      logger.e('load firestore error: $e');
-      try {
-        final jsonData = await rootBundle.loadString('assets/data/history.json');
-        final List<dynamic> decodedData = jsonDecode(jsonData);
-        return decodedData
-            .map((item) => item as Map<String, dynamic>)
-            .toList();
-      } catch (e) {
-        logger.e('load local data error: $e');
-        return [];
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.map((doc) {
+          return {
+            'id': doc.id,
+            ...doc.data(),
+          };
+        }).toList();
       }
+    } catch (e) {
+      logger.e('load firestore history error: $e');
+    }
+
+    try {
+      final jsonData = await rootBundle.loadString('assets/data/history.json');
+      final List<dynamic> decodedData = jsonDecode(jsonData);
+      return decodedData
+          .map((item) => item as Map<String, dynamic>)
+          .toList();
+    } catch (e) {
+      logger.e('load local history data error: $e');
+      return [];
     }
   }
 
