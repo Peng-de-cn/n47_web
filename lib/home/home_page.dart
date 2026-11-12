@@ -131,6 +131,18 @@ class _HomePageState extends State<HomePage> {
                 constraints: const BoxConstraints(maxWidth: 1200),
                 child: Column(
                   children: [
+                    Text(
+                      AppLocalizations.of(context)!.futureEventsTitle,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Rajdhani',
+                        fontSize: isMobile ? 26 : 36,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black87,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 24.0 : 36.0),
                     if (!isMobile) ...[
                       Row(
                         children: [

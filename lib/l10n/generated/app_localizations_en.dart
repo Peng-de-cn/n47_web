@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Be Prepared For The Alpine And Beyond!';
 
   @override
+  String get futureEventsTitle => '26/27 SEASON EVENT CALENDAR';
+
+  @override
   String get tableHeaderDate => 'DATE';
 
   @override
