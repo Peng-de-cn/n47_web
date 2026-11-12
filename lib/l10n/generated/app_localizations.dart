@@ -100,6 +100,12 @@ abstract class AppLocalizations {
   /// **'Be Prepared For The Alpine And Beyond!'**
   String get appTitle;
 
+  /// No description provided for @futureEventsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'26/27 SEASON EVENT CALENDAR'**
+  String get futureEventsTitle;
+
   /// No description provided for @tableHeaderDate.
   ///
   /// In en, this message translates to:
